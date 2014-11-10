@@ -13,17 +13,35 @@ typedef struct{
     double y;
 }point;
 
-typedef struct *Element{
-    *Element prev;
+typedef struct Element{
+    struct Element* prev;
     point point;
-    *Element next;
+    struct Element* next;
     int index;
 }elem;
 
 typedef struct{
-    *Element head;
+    elem* head;
     int N;
-}PolygonList;
+}Polygon;
+
+
+point createPoint(double a, double b);
+/*
+ *Creates a point with coordinates :
+ *X-axis=a
+ *Y-axis=b
+ */
+
+Polygon createPolygon();
+/*
+ *creates an empty polygon
+ */
+
+Polygon addPoint(Polygon a, point b);
+/*
+ *Add a point b in the polygon a at the end
+ */
 
 #endif
 
