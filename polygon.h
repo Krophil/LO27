@@ -40,8 +40,12 @@ Polygon createPolygon();
 
 Polygon addPoint(Polygon a, point b);
 /*
- *Add a point b in the polygon a at the end
+ *Adds a point b in the polygon a at the end
  */
 
+Polygon removePoint(Polygon p, int i);
+/*
+ * Removes the ith point in the polygon p
+ */
 #endif
 

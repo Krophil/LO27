@@ -47,3 +47,20 @@ Polygon addPoint(Polygon a, point b){
     a.N++;
     return a;
 }
+
+Polygon removePoint(Polygon p, int i){
+    int j;
+    elem* supp;
+    supp=p.head;
+    if(p.N!=0){
+        for(j=0;j<i;j++){
+            supp=p.head->next;
+        }
+    supp->prev->next=supp->next;
+    supp->next->prev=supp->prev;
+    free(supp);
+    }
+    return p;
+}
+
+
