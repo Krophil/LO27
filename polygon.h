@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef DEF_
-#define DEF_
+#ifndef POLYGON_H
+#define POLYGON_H
 
 typedef struct{
     double x;
