@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <polygon.h>
+#include "polygon.h"
 
 int main(int argc, char* argv[]){
 
@@ -63,4 +63,7 @@ Polygon removePoint(Polygon p, int i){
     return p;
 }
 
-
+Polygon unionPolygons(Polygon p, Polygon q){
+    p.head->prev->next=q.head;
+    q.head->prev=p.head;
+}

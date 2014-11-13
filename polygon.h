@@ -47,5 +47,10 @@ Polygon removePoint(Polygon p, int i);
 /*
  * Removes the ith point in the polygon p
  */
+
+Polygon unionPolygons(Polygon p, Polygon q);
+/*
+ *computes the union between the two specified polygons
+ */
 #endif
 
