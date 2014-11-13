@@ -64,6 +64,16 @@ Polygon removePoint(Polygon p, int i){
 }
 
 Polygon unionPolygons(Polygon p, Polygon q){
-    p.head->prev->next=q.head;
-    q.head->prev=p.head;
-}
+    Polygon r = createPolygon();
+    elem* i=p.head;
+    do{
+        r=addPoint(r,i->point);
+        i=i->next;
+    } while(i!=NULL);
+    i=q.head;
+    r=addPoint(r,i->point);
+    do{
+        r=addPoint(r,i->point);
+        i=i->next;
+    } while(i!=NULL);
+  }
