@@ -8,16 +8,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "polygon.h"
+#include <polygon.h>
 
 int main(int argc, char* argv[]){
 
     return EXIT_SUCCESS;
 }
 
-point createPoint(double a, double b){
-    point* p;
-    p=(point *) malloc(sizeof(point));
+Point createPoint(double a, double b){
+    Point* p;
+    p=(Point *) malloc(sizeof(Point));
     p->x=a;
     p->y=b;
     return *p;
@@ -30,8 +30,8 @@ Polygon createPolygon(){
     return p;
 }
 
-Polygon addPoint(Polygon a, point b){
-    elem B;
+Polygon addPoint(Polygon a, Point b){
+    Element B;
     B.point = b;
 
     if(a.N==0){
@@ -50,8 +50,15 @@ Polygon addPoint(Polygon a, point b){
 
 Polygon removePoint(Polygon p, int i){
     int j;
-    elem* supp;
+    Element* supp;
     supp=p.head;
+    if (i==1)
+    {
+        p.head->next=p.head;
+        p.head->prev->prev->next=p.head;
+    }
+
+
     if(p.N!=0){
         for(j=0;j<i;j++){
             supp=p.head->next;
@@ -65,7 +72,7 @@ Polygon removePoint(Polygon p, int i){
 
 Polygon unionPolygons(Polygon p, Polygon q){
     Polygon r = createPolygon();
-    elem* i=p.head;
+    Element* i=p.head;
     do{
         r=addPoint(r,i->point);
         i=i->next;
@@ -77,3 +84,28 @@ Polygon unionPolygons(Polygon p, Polygon q){
         i=i->next;
     } while(i!=NULL);
   }
+
+void printPoint(int i){
+    printf("test");
+}
+
+Bool containsPolygon(Polygon p, Point point){
+    Bool oddNodes=0;
+    int i;
+    Element* testa=p.head;
+    Element* testb=p.head->prev;
+    if (p.N<3){
+        return FALSE;
+    }else{
+        for(i=0;i<p.N;i++){
+            if(testa->point.y<point.y && testb->point.y>=point.y || testb->point.y<point.y && testa->point.y>=point.y){
+                if(testa->point.x+(point.y+testa->point.y)/(testb->point.y-testa->point.y)*(testb->point.x-testa->point.x)<point.x){
+                    oddNodes= !oddNodes;
+                }
+            }
+        testb=testa;
+        testa=testa->next;
+        }
+}
+return oddNodes;
+}

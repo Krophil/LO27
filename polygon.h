@@ -7,26 +7,38 @@
 
 #ifndef POLYGON_H
 #define POLYGON_H
-
+#include <bool.h>
 typedef struct{
     double x;
     double y;
-}point;
-
-typedef struct Element{
-    struct Element* prev;
-    point point;
-    struct Element* next;
-    int index;
-}elem;
+}Point;
 
 typedef struct{
-    elem* head;
+    Point point;
+    Point* next;
+    int index;
+}PointList;
+
+typedef struct elem{
+    struct elem* prev;
+    Point point;
+    struct elem* next;
+    int index;
+}Element;
+
+typedef struct{
+    Element* head;
     int N;
 }Polygon;
 
+typedef struct{
+    Polygon pol;
+    int N;
+}
 
-point createPoint(double a, double b);
+
+
+Point createPoint(double a, double b);
 /*
  *Creates a point with coordinates :
  *X-axis=a
@@ -50,7 +62,17 @@ Polygon removePoint(Polygon p, int i);
 
 Polygon unionPolygons(Polygon p, Polygon q);
 /*
- *computes the union between the two specified polygons
+ * Computes the union between the two specified polygons
+ */
+
+void printPoint(int i);
+/*
+ * print the ith point in the list of points.
+ */
+
+Bool containsPolygon(Polygon p, Point b);
+/*
+ *returns true if the specified polygon contains the specified point, false otherwise
  */
 #endif
 
