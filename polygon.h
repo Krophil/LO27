@@ -70,7 +70,7 @@ void printPoint(int i);
  * print the ith point in the list of points.
  */
 
-Bool containsPolygon(Polygon p, Point b);
+Bool containsPoint(Polygon p, Point b);
 /*
  *returns true if the specified polygon contains the specified point, false otherwise
  */

@@ -89,7 +89,7 @@ void printPoint(int i){
     printf("test");
 }
 
-Bool containsPolygon(Polygon p, Point point){
+/*Bool containsPoint(Polygon p, Point point){
     Bool oddNodes=0;
     int i;
     Element* testa=p.head;
@@ -99,7 +99,7 @@ Bool containsPolygon(Polygon p, Point point){
     }else{
         for(i=0;i<p.N;i++){
             if(testa->point.y<point.y && testb->point.y>=point.y || testb->point.y<point.y && testa->point.y>=point.y){
-                if(testa->point.x+(point.y+testa->point.y)/(testb->point.y-testa->point.y)*(testb->point.x-testa->point.x)<point.x){
+                if(testa->point.x+(point.y-testa->point.y)/(testb->point.y-testa->point.y)*(testb->point.x-testa->point.x)<point.x){
                     oddNodes= !oddNodes;
                 }
             }
@@ -108,4 +108,36 @@ Bool containsPolygon(Polygon p, Point point){
         }
 }
 return oddNodes;
+}*/
+
+Bool containsPoint(Polygon p, Point point){
+    int intersect=0, i;
+    /*intersect represents the number of intersections between the ray of the testing point
+     * and the different sides of the polygon
+     */
+    Element* testa=p.head;
+    Element* testb=p.head->prev;
+    /*testa and testb are two consecutive points in the polygon
+     */
+
+    if (p.N<3){
+        return FALSE;
+    }else{
+        for (i=0;i<p.N;i++){/*p.N is the number of points in the polygon*/
+        if(testa->point.y<point.y && testb->point.y>=point.y || testb->point.y<point.y && testb->point.y>=point.y){
+            /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
+             */
+            testb=testa;
+            testa=testa->next;
+        }else if(testa->point.x+((point.y-testa->point.y)/(testb->point.y-testa->point.y))*(testb->point.x-testa->point.x)<=point.x){
+            /*calculates the X-coordinate intersection between the ray of the testing point and the segment between point a and point b
+             * if X>=Xintersec, it means there is an intersection
+             */
+            intersect++;
+            testb=testa;
+            testa=testa->next;
+        }
+    }
+    return intersect%2;
+}
 }
