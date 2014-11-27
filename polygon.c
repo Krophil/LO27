@@ -83,7 +83,8 @@ Polygon unionPolygons(Polygon p, Polygon q){
         r=addPoint(r,i->point);
         i=i->next;
     } while(i!=NULL);
-  }
+return r;
+}
 
 void printPoint(int i){
     printf("test");
@@ -124,7 +125,7 @@ Bool containsPoint(Polygon p, Point point){
         return FALSE;
     }else{
         for (i=0;i<p.N;i++){/*p.N is the number of points in the polygon*/
-        if(testa->point.y<point.y && testb->point.y>=point.y || testb->point.y<point.y && testb->point.y>=point.y){
+        if((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testb->point.y>=point.y)){
             /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
              */
             testb=testa;

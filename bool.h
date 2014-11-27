@@ -15,5 +15,3 @@ typedef enum{
 
 
 #endif
-E=0
-}Bool;

@@ -31,12 +31,10 @@ typedef struct{
     int N;
 }Polygon;
 
-typedef struct{
-    Polygon pol;
-    int N;
-}
-
-
+/*typedef struct{
+ *  Polygon pol;
+ *  int N;
+}*/
 
 Point createPoint(double a, double b);
 /*
@@ -50,7 +48,7 @@ Polygon createPolygon();
  *creates an empty polygon
  */
 
-Polygon addPoint(Polygon a, point b);
+Polygon addPoint(Polygon a, Point b);
 /*
  *Adds a point b in the polygon a at the end
  */
