@@ -2,6 +2,8 @@
  * Pierre Brunet
  * pierre.brunet-de-monthelie@utbm.fr
  *
+ * Guillaume Prost
+ * guillaume.prost@utbm.fr
  *
  */
 

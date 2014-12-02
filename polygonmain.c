@@ -2,7 +2,10 @@
  * Pierre Brunet
  * pierre.brunet-de-monthelie@utbm.fr
  *
- * Subject :
+ * Guillaume Prost
+ * guillaume.prost@utbm.fr
+ *
+ * Subject : Interface for the 2D polygon library
  *
  */
 
