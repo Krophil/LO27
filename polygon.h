@@ -93,5 +93,7 @@ Bool inside(Polygon p1, Polygon P2);
 Bool outside(Polygon p1,Polygon p2);
 
 Bool equal(Polygon p1,Polygon p2);
+
+Polygon centralSymmetry(Polygon p, Point a);
 #endif
 

@@ -223,3 +223,17 @@ Bool equal(Polygon p1, Polygon p2){
     return same;
 }
 
+
+Polygon centralSymmetry(Polygon p, Point a){
+    Polygon newPol= createPolygon();
+    Element* cr=p.head;
+    Point point;
+    int i;
+    do{
+        point.x=2*a.x-cr->point.x;
+        point.y=2*a.x-cr->point.y;
+        newPol=addPoint(newPol,point);
+        i++;
+    }while(i<p.N);
+    return newPol;
+}
