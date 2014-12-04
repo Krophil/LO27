@@ -10,6 +10,8 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 #include <bool.h>
+#include <state.h>
+
 typedef struct{
     double x;
     double y;
@@ -74,5 +76,22 @@ Bool containsPoint(Polygon p, Point b);
 /*
  *returns true if the specified polygon contains the specified point, false otherwise
  */
+
+State containsPolygon(Polygon p1, Polygon p2);
+/*
+ *returns :
+ * INSIDE if the second polygon is fully inside the first one ;
+ * OUTSIDE if the second polygon is fully outside the first one ;
+ * INTERSECT if the second polygon is partially inside/outside the first
+ * one, in other words intersecting the second one ;
+ * ENCLOSING if the first polygon is fully inside the second one ;
+ * EQUAL both polygons are exactly equal.
+ */
+
+Bool inside(Polygon p1, Polygon P2);
+
+Bool outside(Polygon p1,Polygon p2);
+
+Bool equal(Polygon p1,Polygon p2);
 #endif
 

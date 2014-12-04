@@ -128,20 +128,98 @@ Bool containsPoint(Polygon p, Point point){
         return FALSE;
     }else{
         for (i=0;i<p.N;i++){/*p.N is the number of points in the polygon*/
-        if((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testb->point.y>=point.y)){
-            /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
-             */
-            testb=testa;
-            testa=testa->next;
-        }else if(testa->point.x+((point.y-testa->point.y)/(testb->point.y-testa->point.y))*(testb->point.x-testa->point.x)<=point.x){
-            /*calculates the X-coordinate intersection between the ray of the testing point and the segment between point a and point b
-             * if X>=Xintersec, it means there is an intersection
-             */
-            intersect++;
-            testb=testa;
-            testa=testa->next;
+            if((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testb->point.y>=point.y)){
+                /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
+                 */
+                testb=testa;
+                testa=testa->next;
+            }else if(testa->point.x+((point.y-testa->point.y)/(testb->point.y-testa->point.y))*(testb->point.x-testa->point.x)<=point.x){
+                /*calculates the X-coordinate intersection between the ray of the testing point and the segment between point a and point b
+                 * if X>=Xintersec, it means there is an intersection
+                 */
+                intersect++;
+                testb=testa;
+                testa=testa->next;
+            }
+        }
+        return intersect%2;
+    }
+}
+
+State containsPolygon(Polygon p1, Polygon p2){
+    if (inside(p1,p2)){
+        if(equal(p1,p2)){
+            return EQUAL;
+        }
+        return INSIDE;
+    }else if(outside(p1,p2)){
+            if (inside(p2,p1)){
+                return ENCLOSING;
+            }else{
+                return OUTSIDE;
         }
     }
-    return intersect%2;
+    return INTERSECT;
 }
+
+
+Bool inside(Polygon p1, Polygon p2){
+    if(p1.N==p2.N){
+        Element* test=p2.head;
+        Bool isInside=TRUE;
+        int i=0;
+        do{
+            isInside=containsPoint(p1,test->point);
+            test=test->next;
+            i++;
+        }while(isInside==TRUE && i<p1.N);
+        return isInside;
+    }else{
+        return FALSE;
+    }
 }
+
+Bool outside(Polygon p1, Polygon p2){
+    Element* test=p2.head;
+    Bool isInside=TRUE;
+    int i=0;
+    do{
+        isInside=containsPoint(p2,test->point);
+        test=test->next;
+        i++;
+    }while(isInside==FALSE && i<p1.N);
+    return !isInside;
+}
+
+Bool equal(Polygon p1, Polygon p2){
+    Element* a;
+    Element* b;
+    a=p1.head;
+    b=p2.head;
+    int i=0;
+    Bool same;
+    do{
+        if(a->point.x=b->point.x && a->point.y==b->point.y){
+            same=TRUE;
+        }
+        b=b->next;
+        i++;
+    }while(same==FALSE && i<p2.N);
+    if(same==TRUE){
+        b=b->prev;
+        same=FALSE;
+        i=0;
+        do{
+            if(a->point.x=b->point.x && a->point.y==b->point.y){
+                same=TRUE;
+                a=a->next;
+                b=b->next;
+                i++;
+            }else{
+                same=FALSE;
+            }
+        }while(same==TRUE && i<p2.N);
+    }
+    return same;
+}
+
