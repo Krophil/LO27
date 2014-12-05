@@ -95,5 +95,7 @@ Bool outside(Polygon p1,Polygon p2);
 Bool equal(Polygon p1,Polygon p2);
 
 Polygon centralSymmetry(Polygon p, Point a);
+
+Bool isOnTheLine(Point p, Point a, Point b);
 #endif
 

@@ -121,6 +121,7 @@ Bool containsPoint(Polygon p, Point point){
      */
     Element* testa=p.head;
     Element* testb=p.head->prev;
+    Bool line, isIn;
     /*testa and testb are two consecutive points in the polygon
      */
 
@@ -141,8 +142,10 @@ Bool containsPoint(Polygon p, Point point){
                 testb=testa;
                 testa=testa->next;
             }
+            isIn=intersect%2;
+            line=isOnTheLine(point,testa->point,testb->point);
         }
-        return intersect%2;
+        return isIn||line;
     }
 }
 
@@ -151,8 +154,12 @@ State containsPolygon(Polygon p1, Polygon p2){
         if(equal(p1,p2)){
             return EQUAL;
         }
+        else if(inside(p2,p1)){
+            return SAMESHAPE;
+                }
         return INSIDE;
-    }else if(outside(p1,p2)){
+    }
+    else if(outside(p1,p2)){
             if (inside(p2,p1)){
                 return ENCLOSING;
             }else{
@@ -223,6 +230,20 @@ Bool equal(Polygon p1, Polygon p2){
     return same;
 }
 
+Bool isOnTheLine(Point p, Point a, Point b){
+    Point vectA,vectB;
+    vectA.x=p.x-a.x;
+    vectA.y=p.y-a.y;
+    vectB.x=b.x-a.x;
+    vectB.y=b.y-a.y;
+    Bool line=FALSE;
+    if(vectA.x*vectB.y-vectB.x*vectB.y==0){
+        if((p.x<=a.x && p.y<=a.y && p.y>=b.y && a.y>=b.y)||(p.x>=a.x && p.y>=a.y && p.y<=b.y && a.y<=b.y)){
+            line=TRUE;
+                }
+            }
+    return line;
+}
 
 Polygon centralSymmetry(Polygon p, Point a){
     Polygon newPol= createPolygon();
@@ -237,3 +258,5 @@ Polygon centralSymmetry(Polygon p, Point a){
     }while(i<p.N);
     return newPol;
 }
+
+
