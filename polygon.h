@@ -97,5 +97,7 @@ Bool equal(Polygon p1,Polygon p2);
 Polygon centralSymmetry(Polygon p, Point a);
 
 Bool isOnTheLine(Point p, Point a, Point b);
+
+Bool intersectSegment(Point p0, Point p1, Point p2, Point* i);
 #endif
 

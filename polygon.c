@@ -259,4 +259,26 @@ Polygon centralSymmetry(Polygon p, Point a){
     return newPol;
 }
 
+Bool intersect(Point p0, Point p1, Point p2, Point* i){
+    Point s1,s2;
+    s1.x=p1.x-p0.x;
+    s1.y=p1.y-p0.y;
+    s2.x=p2.x-p0.x;
+    s2.y=p2.y-p0.y;
 
+    float s, t;
+    s = (-s1.y*(p0.x-p2.x)+s1.x*(p0.y-p2.y))/(-s2.x*s1.y+s1.x*s2.y);
+    t = ( s2.x*(p0.y-p2.y)-s2.y*(p0.x-p2.x))/(-s2.x*s1.y+s1.x*s2.y);
+
+    if(s>=0&&s<=1&&t>=0&&t<=1)
+    {
+        // Collision detected
+        if (i!=NULL)
+            i->x=p0.x+(t*s1.x);
+            i->y=p0.y+(t*s1.y);
+        return 1;
+    }else{
+    return 0; // No collision
+
+    }
+}
