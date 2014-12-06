@@ -55,14 +55,13 @@ Polygon removePoint(Polygon p, int i){
     int j;
     Element* supp;
     supp=p.head;
-    if (i==1)
-    {
-        p.head->next=p.head;
-        p.head->prev->prev->next=p.head;
-    }
 
 
-    if(p.N!=0){
+    if(p.N>=0){
+        if (i==1){
+            p.head->next=p.head;
+            p.head->prev->prev->next=p.head;
+        }
         for(j=0;j<i;j++){
             supp=p.head->next;
         }
@@ -76,43 +75,29 @@ Polygon removePoint(Polygon p, int i){
 Polygon unionPolygons(Polygon p, Polygon q){
     Polygon r = createPolygon();
     Element* i=p.head;
-    do{
+    State status=containsPolygon(p,q);
+    if(status==INSIDE || status==ENCLOSING){
+        do{
+            r=addPoint(r,i->point);
+            i=i->next;
+        } while(i!=NULL);
+        i=q.head;
         r=addPoint(r,i->point);
-        i=i->next;
-    } while(i!=NULL);
-    i=q.head;
-    r=addPoint(r,i->point);
-    do{
-        r=addPoint(r,i->point);
-        i=i->next;
-    } while(i!=NULL);
-return r;
-}
-
-void printPoint(int i){
-    printf("test");
-}
-
-/*Bool containsPoint(Polygon p, Point point){
-    Bool oddNodes=0;
-    int i;
-    Element* testa=p.head;
-    Element* testb=p.head->prev;
-    if (p.N<3){
-        return FALSE;
-    }else{
-        for(i=0;i<p.N;i++){
-            if(testa->point.y<point.y && testb->point.y>=point.y || testb->point.y<point.y && testa->point.y>=point.y){
-                if(testa->point.x+(point.y-testa->point.y)/(testb->point.y-testa->point.y)*(testb->point.x-testa->point.x)<point.x){
-                    oddNodes= !oddNodes;
-                }
-            }
-        testb=testa;
-        testa=testa->next;
+        do{
+            r=addPoint(r,i->point);
+            i=i->next;
+        } while(i!=NULL);
+    }else if(status==SAMESHAPE){
+        if(p.N>=q.N){
+            r=p;
+        }else{
+            r=q;
         }
+    }else if (status==INTERSECT){
+
+    }
+    return r;
 }
-return oddNodes;
-}*/
 
 Bool containsPoint(Polygon p, Point point){
     int intersect=0, i;
@@ -228,6 +213,7 @@ Bool equal(Polygon p1, Polygon p2){
         }while(same==TRUE && i<p2.N);
     }
     return same;
+
 }
 
 Bool isOnTheLine(Point p, Point a, Point b){
@@ -259,26 +245,26 @@ Polygon centralSymmetry(Polygon p, Point a){
     return newPol;
 }
 
-Bool intersect(Point p0, Point p1, Point p2, Point* i){
+Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
     Point s1,s2;
-    s1.x=p1.x-p0.x;
-    s1.y=p1.y-p0.y;
-    s2.x=p2.x-p0.x;
-    s2.y=p2.y-p0.y;
+    s1.x=p2.x-p1.x;
+    s1.y=p2.y-p1.y;
+    s2.x=p4.x-p3.x;
+    s2.y=p4.y-p3.y;
 
-    float s, t;
-    s = (-s1.y*(p0.x-p2.x)+s1.x*(p0.y-p2.y))/(-s2.x*s1.y+s1.x*s2.y);
-    t = ( s2.x*(p0.y-p2.y)-s2.y*(p0.x-p2.x))/(-s2.x*s1.y+s1.x*s2.y);
+    double s, t;
+    s = (-s1.y*(p1.x-p3.x)+s1.x*(p1.y-p3.y))/(-s2.x*s1.y+s1.x*s2.y);
+    t = ( s2.x*(p1.y-p3.y)-s2.y*(p1.x-p3.x))/(-s2.x*s1.y+s1.x*s2.y);
 
-    if(s>=0&&s<=1&&t>=0&&t<=1)
-    {
-        // Collision detected
-        if (i!=NULL)
-            i->x=p0.x+(t*s1.x);
-            i->y=p0.y+(t*s1.y);
-        return 1;
+    if((s>=0)&&(s<=1)&&(t>=0)&&(t<=1)){ /* Collision detected */
+        if (i!=NULL){
+            i->x=p1.x+(t*s1.x);
+            i->y=p1.y+(t*s1.y);
+        }
+        return TRUE;
     }else{
-    return 0; // No collision
-
+        return FALSE; /* No collision */
     }
 }
+
+

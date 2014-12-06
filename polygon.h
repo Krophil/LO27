@@ -67,11 +67,6 @@ Polygon unionPolygons(Polygon p, Polygon q);
  * Computes the union between the two specified polygons
  */
 
-void printPoint(int i);
-/*
- * print the ith point in the list of points.
- */
-
 Bool containsPoint(Polygon p, Point b);
 /*
  *returns true if the specified polygon contains the specified point, false otherwise
@@ -98,6 +93,8 @@ Polygon centralSymmetry(Polygon p, Point a);
 
 Bool isOnTheLine(Point p, Point a, Point b);
 
-Bool intersectSegment(Point p0, Point p1, Point p2, Point* i);
+Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i);
+
+Polygon unionPolygons(Polygon p1, Polygon p2);
 #endif
 
