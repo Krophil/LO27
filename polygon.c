@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <polygon.h>
+#include <math.h>
+#include <string.h>
+
 
 int main(int argc, char* argv[]){
 
@@ -268,3 +271,352 @@ Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
 }
 
 
+Polygon rotatePolygon(Polygon p, Point center, float angle){
+
+
+
+    /*
+     * tempi : integer, used as the iteration variable of a for-loop
+     * xr, yr : doubles, respectivly the coordinates of the new rotated point on the x-axis and the y-axis
+     * temp1 : double, store the value of an angle
+     * temp2: double, store the value of the norm of a vector
+     * protated : Polygon, correspond to the rotated version of the initail polygon
+     * temppt : Point, temporarly store the current coordinates of the newly rotated point
+     */
+
+    int tempi;
+    double xr, yr, temp1, temp2;
+    Polygon protated = createPolygon();
+    Point temppt;
+
+/* this for-loop is used for taking every single points of the initial polygon */
+    for(tempi = 0; tempi < p.N; tempi++){
+
+    /* if the polygon is not empty */
+        if( p.N != 0){
+
+      /* we check if the current point and the center of the rotation are equals. If it's the case, applying the rotation algorithm is pointless. */
+             if( pointsEquality( p.head->point, center )){
+
+             }
+             else{
+
+                /* first of all, we compute the value of the angle between the x-axis and the vector linking the center to the current point of the polygon. */
+                  temp1 = atan( ( p.head->point.y - center.y) / (p.head->point.x - center.x) - angle );
+
+                /* Then we compute the norm of this vector */
+                  temp2 = sqrt( pow(( p.head->point.x - center.x),2) + pow(( p.head->point.y - center.y ),2) );
+
+                /* we calculate the coordinates of the new rotated point */
+                  xr = temp2 + cos(temp1) + center.x;
+                  yr = temp2 + sin(temp1) + center.y;
+
+                /* we create this point with the coordinates we've found before */
+                  temppt = createPoint(xr, yr);
+
+                /* we add this point to the polygon which will contains the rotated points */
+                  protated = addPoint( protated, temppt);
+
+
+
+              }
+
+
+
+        }
+
+        /* and we place the 'head' pointer of the initial polygon on the next point */
+                  p.head = p.head->next;
+    }
+
+    return protated;
+}
+
+
+Bool pointsEquality( Point A, Point B){
+
+/* equals : boolean, TRUE is the two points are equals, FALSE otherwise */
+    Bool equals = FALSE;
+
+/* i : integer, iteration variable for a fro-loop */
+    int i;
+
+/* pt1, pt2 : array of caracters, respecctivly store the strings corresponding to the first and the second points given in parameters */
+    char* pt1 = (char*) malloc(25*sizeof(char));
+    char* pt2 = (char*) malloc(25*sizeof(char));
+
+/* this for-loop initialize the array of caracters by putting in every place a space */
+    for(i=0; i<24; i++){
+        pt1[i] = ' ';
+        pt2[i] = ' ';
+    }
+
+/* store the coordinates of the 2 points given in the 2 arrays. the x and y coordinates are separeted by a coma. */
+    sprintf( pt1, "%.5f,%.5f", A.x, A.y);
+    sprintf( pt2, "%.5f,%.5f", B.x, B.y);
+
+/* the function strcmp return 0 if the 2 strings are strictly identicals */
+    if(strcmp(pt1, pt2)==0){
+        equals = TRUE;
+    }
+
+    return equals;
+
+}
+
+
+Polygon scalePolygon(Polygon p, float factor){
+
+/*
+ * i : integer, iteration variable for a for-loop
+ * temppt : Point, store the coordinates of the current point of the polygon, which change with each iteration of the for-loop
+ * ref : Point, store the coordinates of the first point of the polygon, which will act a the stationary reference
+ * pscaled : Polygon, store the scaled version of the polygon given in parameter
+ */
+    int i;
+    Point temppt;
+    Point ref = p.head->point;
+    Polygon pscaled = createPolygon();
+
+/* if the polygon have a least 1 point */
+    if(p.N > 0){
+        /* we add the first point of the initial polygon (the reference) to the scaled polygon without changing anything */
+        addPoint(pscaled, p.head->point);
+
+        /* if there's more than 1 single point in the polygon */
+        if(p.N > 1){
+
+            /* from the 2nd point to the last point of the polygon */
+            for(i=1;  i<p.N-1; i++){
+                /* we take the next point in the initial polygon */
+                    p.head = p.head->next;
+                /* we scale the vector linking the ref-point to the current point by the given factor and we store the new coordinates in the temporary Point-type variable */
+                    temppt = createPoint( (p.head->point.x - ref.x)*factor + ref.x , (p.head->point.y - ref.y)*factor + ref.y );
+                /* then we add this point to the scaled version of the polygon */
+                    addPoint(pscaled, temppt);
+
+            }
+        }
+    }
+
+    return pscaled;
+
+}
+
+
+Polygon translatePolygon(Polygon p, Point pt1, Point pt2){
+
+    int i;
+    Point temppt;
+    Point tvect = createPoint( pt2.x - pt1.x , pt2.y - pt1.y );
+    Polygon ptranslated = createPolygon();
+
+    if( p.N > 0){
+
+        for(i=0; i < p.N; i++){
+
+            temppt = createPoint(p.head->point.x + tvect.x, p.head->point.y + tvect.y);
+            ptranslated = addPoint( ptranslated, temppt);
+            p.head = p.head->next;
+
+        }
+    }
+
+    return ptranslated;
+}
+
+
+void printPoint(Point pt){
+
+    printf("[%.2f,%.2f]", pt.x, pt.y);
+
+}
+
+
+void printPolygon(Polygon p){
+
+    /*
+     * i : integer, iteration value for a for-loop
+     */
+    int i;
+    if(p.N > 0){
+
+        /* we start by prompting an opening bracket and the first point of the polygon */
+        printf("[");
+        printPoint(p.head->point);
+
+        if(p.N >1){
+            /* after that, for each point of the polygon, we display it on the user's screen, separeted from the previous point by a coma */
+            for(i = 1; i<= p.N-1; i++){
+
+              printf(",");
+              p.head = p.head->next;
+              printPoint(p.head->point);
+
+            }
+        }
+
+         /* finaly, we put and ending bracket */
+         printf("]");
+    }
+}
+
+
+char* toString(Polygon p){
+
+    /*
+     * i : integer, size of the string that we'll return at the end of this function
+     * j : integer, iteration value for a for-loop
+     * index : integer, total length of all already-stored characters
+     */
+    int i = 100, j;
+    int index;
+
+    /*
+     * firstpt : boolean, TRUE if the current point is the first, FALSE otherwise
+     * buffer : string, store the differents coordinates of all points of the given polygon. have a size of i characters
+     */
+    Bool firstpt = TRUE;
+    char* buffer = (char*) malloc(i*sizeof(char));
+
+    index = sprintf( buffer, "[");
+
+    /* for every single point of the polygon */
+    for( j=0; j < p.N-1; j++){
+
+        /* if it's the first loop, so the first point */
+        if(firstpt == TRUE){
+            firstpt = FALSE;
+        }
+        else{
+            /* if it's not the first loop, we put a coma before the next point */
+            index = sprintf( buffer, "%s,", buffer);
+        }
+
+        /* we add the next point to the string */
+        index = sprintf( buffer, "%s[%.2f,%.2f]", buffer, p.head->point.x, p.head->point.y);
+
+        /* and we take the next one */
+        p.head = p.head->next;
+
+
+        /* if there's less than 30 empty spaces remaining in the string */
+        if( i - index <= 30){
+
+            /* we add 30 more empty spaces to this string. It's only here to avoid any overflow */
+            i = i + 30;
+            buffer = realloc(buffer, i*sizeof(char));
+        }
+
+    }
+
+    index = sprintf( buffer, "%s]", buffer);
+
+    return buffer;
+}
+
+
+Polygon convexhullPolygon( Polygon p){
+
+    Element*  fstpt = p.head;
+    Element* x;
+    Element* y;
+    Element* z;
+    Polygon chp = createPolygon();
+
+    if(p.N > 0){
+
+        if(p.N == 1 || p.N == 2){
+
+            p.head = p.head->next;
+
+            while( p.head != fstpt){
+
+                chp = addPoint(chp, p.head->point);
+                p.head = p.head->next;
+
+            }
+        }
+        else{
+
+            p = minY(p);
+
+            fstpt = p.head;
+
+            do{
+                x = p.head;
+                y = p.head->next;
+                z = p.head->next->next;
+
+                if( rotDir(x, y, z) == CLOCKWISE){
+
+                        chp = addPoint( chp, y->point);
+                        x = x->next;
+                        y = y->next;
+                        z = z->next;
+                }
+                else{
+
+                    y = y->next;
+                    z = z->next;
+                    }
+                 }while(pointsEquality(y->point, fstpt->point)==FALSE);
+
+            }
+        }
+        return chp;
+}
+
+
+Polygon minY(Polygon p){
+
+    int i;
+    Element* minimumy = p.head;
+
+    for(i=0; i<p.N-1; i++){
+
+        p.head = p.head->next;
+
+        if(p.head->point.y < minimumy->point.y  || ( p.head->point.y <= minimumy->point.y && p.head->point.x < minimumy->point.x ) ){
+
+            minimumy = p.head;
+
+        }
+
+    }
+
+    while( p.head != minimumy ){
+
+        p.head = p.head->next;
+
+    }
+
+    return p;
+
+}
+
+
+
+Rot rotDir(Element* x, Element* y, Element* z){
+
+    Rot rotation;
+    double scalarproduct = (y->point.x - x->point.x)*(z->point.y - x->point.y ) - (y->point.y - x->point.y)*(z->point.x - x->point.x);
+
+    if( scalarproduct > 0){
+
+        rotation = CLOCKWISE;
+    }
+    else{
+        if( scalarproduct < 0){
+
+            rotation = ANTICLOCKWISE;
+        }
+        else{
+
+            rotation = NONE;
+        }
+    }
+
+    return rotation;
+
+}

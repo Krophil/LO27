@@ -46,3 +46,9 @@ $(LIBTARGET): $(LIBSOURCEOFILE)
 clean:
 	@echo "\n Cleaning temporary files"
 	rm -rf *.o *~ *.so *.exe
+
+#Cleaning the content of the current directory
+clear:
+	@echo "\n Cleaning temporary files"
+	rm -rf *.o *~ *.so *.exe
+

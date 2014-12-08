@@ -15,5 +15,10 @@ typedef enum{
     FALSE=0
 }Bool;
 
+typedef enum{
+    NONE = 0,
+    CLOCKWISE = 1,
+    ANTICLOCKWISE = 2
+}Rot;
 
 #endif
