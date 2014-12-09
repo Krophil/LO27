@@ -161,6 +161,7 @@ Rot rotDir(Element* x, Element* y, Element* z);
  * it returns TRUE is the rotation is clockwise, and return FALSE if the rotation is counter-clockwise or if there's no rotation (3 points on the same line).
  */
 
+Element* minCoordinates(Polygon p);
 
 #endif
 
