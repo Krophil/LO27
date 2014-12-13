@@ -81,6 +81,7 @@ Polygon unionPolygons(Polygon p, Polygon q){
     Element* j=q.head;
     Point* intersect;
     State status=containsPolygon(p,q);
+    intersect=NULL;
     if(status==INSIDE || status==ENCLOSING){
         do{
             r=addPoint(r,i->point);
@@ -100,30 +101,33 @@ Polygon unionPolygons(Polygon p, Polygon q){
         }
     }else if (status==INTERSECT){
         i=minCoordinates(p);
-        addPoint(r, i);
+        addPoint(r, i->point);
         if (intersectSegments(i->point,i->next->point,j->point,j->next->point, intersect)){
-            addPoint(r, intersect);
+            addPoint(r, (*intersect));
             if(j->next->point.x>=j->point.x){
                 j=i;
-                i=intersect;
+                i->point=*intersect;
             }else{
 
+            }
         }
     }
     return r;
 }
 
 Bool containsPoint(Polygon p, Point point){
-    int intersect=0, i;
+    int intersect, i;
+    Element* testa;
+    Element* testb;
+    Bool line, isIn;
+    intersect=0;
     /*intersect represents the number of intersections between the ray of the testing point
      * and the different sides of the polygon
      */
-    Element* testa=p.head;
-    Element* testb=p.head->prev;
-    Bool line, isIn;
+    testa=p.head;
+    testb=p.head->prev;
     /*testa and testb are two consecutive points in the polygon
      */
-
     if (p.N<3){
         return FALSE;
     }else{
@@ -200,12 +204,12 @@ Bool outside(Polygon p1, Polygon p2){
 Bool equal(Polygon p1, Polygon p2){
     Element* a;
     Element* b;
+    Bool same;
+    int i=0;
     a=p1.head;
     b=p2.head;
-    int i=0;
-    Bool same;
     do{
-        if(a->point.x=b->point.x && a->point.y==b->point.y){
+        if(a->point.x==b->point.x && a->point.y==b->point.y){
             same=TRUE;
         }
         b=b->next;
@@ -216,7 +220,7 @@ Bool equal(Polygon p1, Polygon p2){
         same=FALSE;
         i=0;
         do{
-            if(a->point.x=b->point.x && a->point.y==b->point.y){
+            if(a->point.x==b->point.x && a->point.y==b->point.y){
                 same=TRUE;
                 a=a->next;
                 b=b->next;
@@ -232,11 +236,11 @@ Bool equal(Polygon p1, Polygon p2){
 
 Bool isOnTheLine(Point p, Point a, Point b){
     Point vectA,vectB;
+    Bool line=FALSE;
     vectA.x=p.x-a.x;
     vectA.y=p.y-a.y;
     vectB.x=b.x-a.x;
     vectB.y=b.y-a.y;
-    Bool line=FALSE;
     if(vectA.x*vectB.y-vectB.x*vectB.y==0){
         if((p.x<=a.x && p.y<=a.y && p.y>=b.y && a.y>=b.y)||(p.x>=a.x && p.y>=a.y && p.y<=b.y && a.y<=b.y)){
             line=TRUE;
@@ -261,12 +265,11 @@ Polygon centralSymmetry(Polygon p, Point a){
 
 Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
     Point s1,s2;
+    double s, t;
     s1.x=p2.x-p1.x;
     s1.y=p2.y-p1.y;
     s2.x=p4.x-p3.x;
     s2.y=p4.y-p3.y;
-
-    double s, t;
     s = (-s1.y*(p1.x-p3.x)+s1.x*(p1.y-p3.y))/(-s2.x*s1.y+s1.x*s2.y);
     t = ( s2.x*(p1.y-p3.y)-s2.y*(p1.x-p3.x))/(-s2.x*s1.y+s1.x*s2.y);
 
@@ -283,9 +286,6 @@ Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
 
 
 Polygon rotatePolygon(Polygon p, Point center, float angle){
-
-
-
     /*
      * tempi : integer, used as the iteration variable of a for-loop
      * xr, yr : doubles, respectivly the coordinates of the new rotated point on the x-axis and the y-axis
@@ -294,7 +294,6 @@ Polygon rotatePolygon(Polygon p, Point center, float angle){
      * protated : Polygon, correspond to the rotated version of the initail polygon
      * temppt : Point, temporarly store the current coordinates of the newly rotated point
      */
-
     int tempi;
     double xr, yr, temp1, temp2;
     Polygon protated = createPolygon();

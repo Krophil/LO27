@@ -14,7 +14,7 @@ typedef enum{
     INTERSECT=3,
     ENCLOSING=4,
     EQUAL=5,
-    SAMESHAPE=6
+    SAMESHAPE=6,
     ERROR=7
 }State;
 

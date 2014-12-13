@@ -18,7 +18,7 @@ int main(int argc, char* argv[]){
     int choice, i, j;
     float f;
     double x, y;
-    Point pt;
+    Point pt,pt1,pt2;
     Polygon p;
     Bool err=FALSE;
     do{
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
                 scanf("%lf",&x);
                 printf("Enter y");
                 scanf("%lf",&y);
-                Point pt =  createPoint(x,y);
+                pt = createPoint(x,y);
                 err=TRUE;
                 break;
             case 2:
@@ -79,17 +79,15 @@ int main(int argc, char* argv[]){
                  scanf("%lf",&x);
                  printf("Enter y");
                  scanf("%lf",&y);
-                 Point pt1 =  createPoint(x,y);
+                 pt1 = createPoint(x,y);
 
                  printf("second point :\n");
                  printf("Enter x");
                  scanf("%lf",&x);
                  printf("Enter y");
                  scanf("%lf",&y);
-                 Point pt2 =  createPoint(x,y);
-
+                 pt2 = createPoint(x,y);
                  p = translatePolygon(p, pt1, pt2);
-
                  err = TRUE;
                  break;
             case 8:
