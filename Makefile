@@ -1,6 +1,6 @@
 #my general makefile template
 CXX = gcc
-CFLAGS = -Wall -Werror -ansi -pedantic -fpic -g
+CFLAGS = -Wall -Werror -ansi -pedantic -fpic -g -std=c99
 LIBSDIR = -L. -L/usr/lib
 INCLUDEDIR = -I. -I/usr/include
 
@@ -30,7 +30,7 @@ run: $(TARGET)
 #Generating the executable
 $(TARGET): $(EXESOURCEOFILE) $(LIBTARGET)
 	@echo "\n Generating the executable " $@
-	$(CXX) $(EXESOURCEOFILE) -l$(LIBTARGET2) $(LIBSDIR) -o $(TARGET)
+	$(CXX) $(EXESOURCEOFILE) -l$(LIBTARGET2) $(LIBSDIR) -o $(TARGET) -lm
 
 #Generating the library binary code
 $(LIBTARGET): $(LIBSOURCEOFILE)
