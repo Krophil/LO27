@@ -37,18 +37,18 @@ Polygon createPolygon(){
 }
 
 Polygon addPoint(Polygon a, Point b){
-    Element B;
-    B.point = b;
-
+    Element* B = (Element *)malloc(sizeof(Element));
+    B->point = b;
     if(a.N==0){
-        a.head->point = b;
-        a.head->prev = a.head;
-        a.head->next = a.head;
+        B->prev = a.head;
+        B->next = a.head;
+        a.head = B;
     }
     else{
-        B.prev=a.head->prev;
-        B.next=a.head;
-        a.head->prev=&B;
+        B->prev=a.head->prev;
+        B->next=a.head;
+        B->prev->next = B;
+        B->next->prev = B;
     }
     a.N++;
     return a;
