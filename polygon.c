@@ -43,8 +43,12 @@ Polygon addPoint(Polygon a, Point b){
         B->prev = a.head;
         B->next = a.head;
         a.head = B;
-    }
-    else{
+    }else if(a.N==1){
+        B->prev = a.head;
+        B->next = a.head;
+        a.head->next = B;
+        a.head->prev = B;
+    }else{
         B->prev=a.head->prev;
         B->next=a.head;
         B->prev->next = B;
@@ -467,7 +471,7 @@ void printPolygon(Polygon p){
         }
 
          /* finaly, we put and ending bracket */
-         printf("]");
+         printf("]\n");
     }
 }
 

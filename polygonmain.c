@@ -2,10 +2,7 @@
  * Pierre Brunet
  * pierre.brunet-de-monthelie@utbm.fr
  *
- * Guillaume Prost
- * guillaume.prost@utbm.fr
- *
- * Subject : Interface for the 2D polygon library
+ * Subject :
  *
  */
 
@@ -13,114 +10,68 @@
 #include <stdlib.h>
 #include <polygon.h>
 #include <string.h>
+#include <ctype.h>
 
 int main(int argc, char* argv[]){
-    int choice, i, j;
-    float f;
-    double x, y;
-    Point pt,pt1,pt2;
-    Polygon p;
-    Bool err=FALSE;
+    char c1,c2;/*, i, j*/;
+    //float f;
+    double x,y;
+    Point pt/*, pt1, pt2*/;
+    Polygon p1;
+    //Polygon p2;
+    Bool err1=FALSE;
+    Bool err2=FALSE;
+    p1=createPolygon();
     do{
-        err = FALSE;
-        i = 0;
-        f = 0;
-        printf("0.exit\n1. createPoint\n2. createPolygon\n3. addPoint\n4. removePoint\n5.scalePolygon\n6.rotatePolygon\n7.translatePolygon\n8.printPoint\n9.printPolygon\n");
-        /*polygon=createPolygon();*/
-        scanf("%d", &choice);
-        switch(choice){
+        err1=FALSE;
+        //i=0;
+        //f=0;
+        printf("0. Exit\n1. Create a point\n2. Remove a point\nYour choice :\t");
+        scanf("%s", &c1);
+        switch(atoi(&c1)){
             case 0:
                 break;
             case 1:
-                printf("Enter x");
+                printf("Enter x : ");
                 scanf("%lf",&x);
-                printf("Enter y");
+                printf("Enter y : ");
                 scanf("%lf",&y);
                 pt = createPoint(x,y);
-                err=TRUE;
+                printPoint(pt);
+                do{
+                    err1=FALSE;
+                    printf("\nWhat do you want to do with this point ?\n0. Return to menu\n1. Add this point on the current polygon\n2. Test if the point is in the current polygon\nYour choice :\t");
+                    scanf("%s", &c2);
+                    switch(atoi(&c2)){
+                        case 0:
+                            err2=FALSE;
+                            break;
+                        case 1:
+                            p1=addPoint(p1,pt);
+                            printPolygon(p1);
+                            err2=FALSE;
+                            break;
+                        case 2:
+                            if(containsPoint(p1,pt)){
+                                printf("The current polygon contains the point.\n");
+                                }else{
+                                printf("The current polygon does not contain the point.\n");
+                                }
+                            err2=FALSE;
+                            break;
+                        default:
+                            printf("Would you mind to reformulate ?\n");
+                            err2=TRUE;
+                            break;
+                            }
+                    err1=TRUE;
+                }while(err2==TRUE);
                 break;
-            case 2:
-                p = createPolygon();
-                err=TRUE;
-                break;
-            case 3:
-                 p = addPoint(p,pt);
-                 err = TRUE;
-                 break;
-            case 4:
-                 printf("point No ? \t");
-                 scanf("%d", &i);
-                 p = removePoint(p, i);
-                 err = TRUE;
-                 break;
-            case 5:
-                 printf("please specify the scaling factor : \t");
-                 scanf("%f", &f);
-                 p = scalePolygon(p, f);
-                 err = TRUE;
-                 break;
-            case 6:
-                 printf("rotation of ?(rad)\t");
-                 scanf("%f", &f);
-                 printf("Around which point ?\n x?\t");
-                 scanf("%lf", &x);
-                 printf("y?\t");
-                 scanf("%lf", &y);
-
-                 pt = createPoint(x, y);
-
-                 p = rotatePolygon(p, pt, f);
-
-                 err = TRUE;
-                 break;
-            case 7:
-                 printf("first point :\n");
-                 printf("Enter x");
-                 scanf("%lf",&x);
-                 printf("Enter y");
-                 scanf("%lf",&y);
-                 pt1 = createPoint(x,y);
-
-                 printf("second point :\n");
-                 printf("Enter x");
-                 scanf("%lf",&x);
-                 printf("Enter y");
-                 scanf("%lf",&y);
-                 pt2 = createPoint(x,y);
-                 p = translatePolygon(p, pt1, pt2);
-                 err = TRUE;
-                 break;
-            case 8:
-                 printf("point No ?\t");
-                 scanf("%d", &i);
-
-                 for( j=0 ; j<i-1 ; j++){
-
-                     p.head = p.head->next;
-                 }
-
-                 printPoint(p.head->point);
-
-                 err = TRUE;
-                 break;
-            case 9:
-                 printPolygon(p);
-                 err = TRUE;
-                 break;
-
-
-
-
             default:
-                printf("Would you mind to reformulate please ?");
-                err = TRUE;
-                break;
+                printf("Would you mind to reformulate ?");
+                err1=TRUE;
         }
-
-    }while(err==TRUE);
-
-    pt.x++;
-
+    }while(err1==TRUE);
     return EXIT_SUCCESS;
 }
 
