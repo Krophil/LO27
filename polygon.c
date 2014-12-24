@@ -43,16 +43,19 @@ Polygon addPoint(Polygon a, Point b){
         B->prev = a.head;
         B->next = a.head;
         a.head = B;
+        a.head->index=1;
     }else if(a.N==1){
         B->prev = a.head;
         B->next = a.head;
         a.head->next = B;
         a.head->prev = B;
+        B->index=2;
     }else{
         B->prev=a.head->prev;
         B->next=a.head;
-        B->prev->next = B;
-        B->next->prev = B;
+            B->prev->next = B;
+            B->next->prev = B;
+        B->index=B->prev->index+1;
     }
     a.N++;
     return a;
@@ -148,12 +151,16 @@ Bool containsPoint(Polygon p, Point point){
                 intersect++;
                 testb=testa;
                 testa=testa->next;
+            }else if(testb->point.x+((point.y-testb->point.y)/(testa->point.y-testb->point.y))*(testa->point.x-testb->point.x)<=point.x){
+                intersect++;
+                testb=testa;
+                testa=testa->next;
+                }
             }
-            isIn=intersect%2;
-            line=isOnTheLine(point,testa->point,testb->point);
         }
+        isIn=intersect%2;
+        line=isOnTheLine(point,testa->point,testb->point);
         return isIn||line;
-    }
 }
 
 State containsPolygon(Polygon p1, Polygon p2){
