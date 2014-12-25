@@ -161,6 +161,23 @@ Rot rotDir(Element* x, Element* y, Element* z);
  * it returns TRUE is the rotation is clockwise, and return FALSE if the rotation is counter-clockwise or if there's no rotation (3 points on the same line).
  */
 
+
+Polygon sortPolygon( Polygon P);
+/*
+ * This function was created to sort in ascending order all the points of a polygon, according to the angle the vector linking the headpoint and them makes with the Ox-axis.
+ * Without this function, the convexhullPolygon function will not work properly.
+ * sortPolygon takes the polygon we want to be sorted in parameter, and return the sorted version.
+ * In our softw<are, the head of the given polygon will always be the point with the lowest Y-coordinates, according to the minY function.
+ */
+
+
+double angleOx( Point a, Point b);
+/*
+ * This function takes 2 points a and b in parameter and returnthe angle between the vector (ba) and the Ox-axis..
+ * angleOx is used in sortPolygon, where the returned angle is use as a sorting criteria.
+ * Without, sortPolygon will not work.
+ */
+
 Element* minCoordinates(Polygon p);
 
 #endif

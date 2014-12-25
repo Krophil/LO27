@@ -539,65 +539,97 @@ char* toString(Polygon p){
 
 Polygon convexhullPolygon( Polygon p){
 
-    Element*  fstpt = p.head;
+    /*
+     * p : Polygon, it's the polygon from polygonmain.c, and this function's goal is to compute its convex hull.
+     * fstpt : pointer on an element of a linked list, aka a polygon. fstpt, which mean 'first point' store the first point of the given polygon p at the initial state of the function.
+     * chp : Polygon, will be the returned polygon at the end of this function. Will store every single point recognize as 'part of the convexhull of p'.
+     * x : pointer on an element of chp.
+     * y : pointer on an element of p.
+     * z : pointer on an element of p.
+     */
+
+    Element* fstpt = p.head;
     Element* x;
     Element* y;
     Element* z;
     Polygon chp = createPolygon();
 
+    /* check if the polygon is not empty */
     if(p.N > 0){
 
+        /* check the trivial cases : 1 or 2 points in the polygon */
         if(p.N == 1 || p.N == 2){
 
-            p.head = p.head->next;
-
-            while( p.head != fstpt){
-
+            /* if it's the case, the convexhull of p is p itself, so chp = p */
+            do{
+                /* we simply add each point of p in chp, and the while-loop will stop when it reach the first point, which mean that each points have been treated */
                 chp = addPoint(chp, p.head->point);
                 p.head = p.head->next;
 
-            }
+            }while( p.head != fstpt);
         }
         else{
-
+    /* if p has 3 or more points, we call 2 functions before computing the convexhull.
+     * first one, minY will simply check every point to find the one with the lowest y-coordinate.
+     * after, sortPolygon will sort the polygon in ascending order according to a specific angle (Cf function sortPolygon), and will put the previiously found point at the head of this sorted version
+     */
             p = minY(p);
+            p = sortPolygon(p);
 
+    /*
+     * Then, we re-set the fstpt value to be the 1st point of p, we add this point to chp, point x on it, and set y and z on the 2nd and 3rd point of p.
+     * x has to be set on a chp's point, because x must only points on a point which is part of the convexhull.
+     */
             fstpt = p.head;
+            chp = addPoint(chp, p.head->point);
+            x = chp.head;
+            y = p.head->next;
+            z = p.head->next->next;
 
-            do{
-                x = p.head;
-                y = p.head->next;
-                z = p.head->next->next;
+
+    /* this do-while-loot check, for each triplet of point, if the angle between xy and yz is CLOCKWISE, ANTICLOCKWISE or if these vector are colinear */
+        do{
+
 
                 if( rotDir(x, y, z) == CLOCKWISE){
-
+                /* if it's clockwise, then y's point is part of the convexhull. we add it to chp and we take the next triplet (x become y, y become z, and z become the next point of p) */
                         chp = addPoint( chp, y->point);
                         x = x->next;
                         y = y->next;
                         z = z->next;
                 }
                 else{
-
+                /* if its not clockwise, then y is not part of the convexhull, and we simply take the next triplet (x is not moving, y become z, and z become the next point of p) */
                     y = y->next;
                     z = z->next;
-                    }
+                }
+
+                /* this process is repeated until we encounter another time the first point stored earlier */
                  }while(pointsEquality(y->point, fstpt->point)==FALSE);
 
             }
         }
+
         return chp;
 }
 
 
 Polygon minY(Polygon p){
 
+    /*
+     * i : integer, use to iterate with a for-loop.
+     * minimumy : pointer on an element of alinked list, aka a point of a polygon. Point on the element with the lowest y-coordinate, which is the first point at the begining.
+     */
+
     int i;
     Element* minimumy = p.head;
+
 
     for(i=0; i<p.N-1; i++){
 
         p.head = p.head->next;
 
+        /* if the current point has a lower y-coord. than the previous value of minimumy, of if it had the same value in y and a lower x-coord., then the current point is the new minimumy value */
         if(p.head->point.y < minimumy->point.y  || ( p.head->point.y <= minimumy->point.y && p.head->point.x < minimumy->point.x ) ){
 
             minimumy = p.head;
@@ -606,6 +638,10 @@ Polygon minY(Polygon p){
 
     }
 
+    /*
+     * at the end of the for-loop, minimumy has stored the point with the lowest y->coordinate.
+     * We simply set it as the head of p, and we return p.
+     */
     while( p.head != minimumy ){
 
         p.head = p.head->next;
@@ -619,6 +655,11 @@ Polygon minY(Polygon p){
 
 
 Rot rotDir(Element* x, Element* y, Element* z){
+
+    /*
+     * rotation : Rot-type variable (Cf bool.h), store a different value depending of the computed angle.
+     * scalarproduct : double, store the result of an equation derived from the scalarproduct which compute a value related to the angle between the vectors xy and yz. negative if the angle is anti-clockwise, positive if it's clockwise, and equal to 0 if the given points are on the same line.
+     */
 
     Rot rotation;
     double scalarproduct = (y->point.x - x->point.x)*(z->point.y - x->point.y ) - (y->point.y - x->point.y)*(z->point.x - x->point.x);
@@ -643,6 +684,7 @@ Rot rotDir(Element* x, Element* y, Element* z){
 }
 
 Element* minCoordinates(Polygon p){
+
     int i;
     Element* mini = p.head;
     Element* test = p.head;
@@ -658,3 +700,97 @@ Element* minCoordinates(Polygon p){
 }
 
 
+Polygon sortPolygon( Polygon p){
+
+    /*
+     * i : integer, iteration variable for a for-loop
+     * j : integer, represent the number of a point (1st point = 0, 2nd point = 1, .....). We use it to know how far we've been along the polygon, to be able to return to the first point.
+     * ptref : Point-type variable, represent the reference point. It should be the point with the lowest ordinates, like the one spoted by the minY function.
+     * sp : Polygon-type variable, sorted version of the given polygon p.
+     * theta : double, store the value of the angle between the vector linking the current point with ptref and the (1,0) vector.
+     */
+
+    int i, j;
+    double theta;
+
+    Point ptref = createPoint( p.head->point.x, p.head->point.y);
+    Polygon sp = createPolygon();
+
+    /* we check if the polygon has at least a point in it. */
+    if(p.head != NULL){
+
+        /* if it has, we add the next one to the sorted polygon, and we move the head of the linked list on the one after it */
+        sp = addPoint(sp, p.head->next->point);
+        p.head = p.head->next->next;
+
+        /* we check if the polygon has at least 2 points. if it has, then we're not in a trivial case, and we can apply the full function */
+        if( p.N >= 2 ){
+
+            for( i = 1; i <= p.N; i++){
+
+        /* we reset the value of j, and, if the current point is not the reference point, then we compute the value of theta */
+                j = 0;
+                if(pointsEquality(p.head->point, ptref)==FALSE){
+
+                    theta = angleOx(p.head->point, ptref);
+
+                    /*  we check, for each point already stored, if theta is lower or greater than the corresponding angle (the previous values of theta) */
+                    while(theta > angleOx(sp.head->point, ptref) && j!=sp.N){
+                    /* if theta is greater, then we move on the next point and we add 1 to the value of j*/
+                        j++;
+                        sp.head = sp.head->next;
+
+                    }
+
+                    if( pointsEquality(p.head->point, sp.head->point) == FALSE){
+                    /* if the current point and the one which will be right after it are differents, we add the current point to sp */
+                        j++;
+                        sp = addPoint(sp, p.head->point);
+
+                    }
+
+                    /* and then, we go back to the begining of sp */
+                    while( j>0 ){
+
+                        j--;
+                        sp.head = sp.head->prev;
+
+                    }
+
+                }
+
+                p.head = p.head->next;
+
+            }
+        /* just before ending the function, we add, at the begining of sp, the reference point, which has to be the head of the returned polygon */
+        sp = addPoint(sp, ptref);
+        sp.head = sp.head->prev;
+
+        }
+
+    }
+
+    return sp;
+
+}
+
+
+
+double angleOx( Point a, Point b){
+
+    /* angle : double, store the value of an angle. Has to be a positive value between 0 and 2*pi */
+    double angle;
+
+    /* angle takes the value of the x-coord. of the vector linking ab divided by the norm of this vector. At this state, -pi <= angle <= pi */
+    angle = acos( (a.x-b.x) / sqrt( pow(a.x-b.x, 2) + pow(a.y-b.y, 2) ) );
+
+    /* if the value is negative, we have to add pi, aka arccos(-1), to the value, which will be positive and between 0 and 2*pi */
+    if(angle < 0){
+
+        angle = angle + acos(-1);
+
+    }
+
+    return angle;
+
+}
