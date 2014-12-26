@@ -98,7 +98,7 @@ int main(int argc, char* argv[]){
                                 printf("Is your polygon complete ? Y or N\t");
                                 scanf("%s",&c1);
                                 if(c1=='Y'||c1=='y'){
-                                    printf("OK");
+                                    printf("%d\n",containsPolygon(p1,p2));
                                     err2=FALSE;
                                 }
                             }while(err2==TRUE);
