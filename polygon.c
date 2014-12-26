@@ -139,6 +139,9 @@ Bool containsPoint(Polygon p, Point point){
         return FALSE;
     }else{
         for (i=0;i<p.N;i++){/*p.N is the number of points in the polygon*/
+            if(isOnTheLine(point, testa->point,testb->point)){
+                    return TRUE;
+            }
             if((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testb->point.y>=point.y)){
                 /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
                  */
@@ -155,8 +158,6 @@ Bool containsPoint(Polygon p, Point point){
                 intersect++;
                 testb=testa;
                 testa=testa->next;
-                }else if(isOnTheLine(point, testa->point,testb->point)){
-                    intersect++;
                 }
             }
         }
@@ -171,8 +172,9 @@ State containsPolygon(Polygon p1, Polygon p2){
         }
         else if(inside(p2,p1)){
             return SAMESHAPE;
-                }
+        }else{
         return INSIDE;
+        }
     }
     else if(outside(p1,p2)){
             if (inside(p2,p1)){
@@ -193,7 +195,7 @@ Bool inside(Polygon p1, Polygon p2){
         isInside=containsPoint(p1,test->point);
         test=test->next;
         i++;
-    }while(isInside==TRUE && i<p1.N);
+    }while(isInside==TRUE && i<p2.N);
     return isInside;
 }
 
@@ -206,7 +208,7 @@ Bool outside(Polygon p1, Polygon p2){
         test=test->next;
         i++;
     }while(isInside==FALSE && i<p1.N);
-    return isInside;
+    return !isInside;
 }
 
 Bool equal(Polygon p1, Polygon p2){
