@@ -304,11 +304,13 @@ Polygon rotatePolygon(Polygon p, Point center, float angle){
      * xr, yr : doubles, respectivly the coordinates of the new rotated point on the x-axis and the y-axis
      * temp1 : double, store the value of an angle
      * temp2: double, store the value of the norm of a vector
-     * protated : Polygon, correspond to the rotated version of the initail polygon
-     * temppt : Point, temporarly store the current coordinates of the newly rotated point
+     * elem : pointer on an element, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
+     * protated : Polygon, correspond to the rotated version of the initial polygon
+     * temppt : Point, temporarily store the current coordinates of the newly rotated point
      */
     int tempi;
     double xr, yr, temp1, temp2;
+    Element* elem = p.head;
     Polygon protated = createPolygon();
     Point temppt;
 
@@ -319,16 +321,16 @@ Polygon rotatePolygon(Polygon p, Point center, float angle){
         if( p.N != 0){
 
       /* we check if the current point and the center of the rotation are equals. If it's the case, applying the rotation algorithm is pointless. */
-             if( pointsEquality( p.head->point, center )){
+             if( pointsEquality( elem->point, center )){
 
              }
              else{
 
                 /* first of all, we compute the value of the angle between the x-axis and the vector linking the center to the current point of the polygon. */
-                  temp1 = atan( ( p.head->point.y - center.y) / (p.head->point.x - center.x) - angle );
+                  temp1 = atan( ( elem->point.y - center.y) / (elem->point.x - center.x) - angle );
 
                 /* Then we compute the norm of this vector */
-                  temp2 = sqrt( pow(( p.head->point.x - center.x),2) + pow(( p.head->point.y - center.y ),2) );
+                  temp2 = sqrt( pow(( elem->point.x - center.x),2) + pow(( elem->point.y - center.y ),2) );
 
                 /* we calculate the coordinates of the new rotated point */
                   xr = temp2 + cos(temp1) + center.x;
@@ -349,43 +351,30 @@ Polygon rotatePolygon(Polygon p, Point center, float angle){
         }
 
         /* and we place the 'head' pointer of the initial polygon on the next point */
-                  p.head = p.head->next;
+                  elem = elem->next;
     }
 
     return protated;
 }
 
 
+
 Bool pointsEquality( Point A, Point B){
 
-/* equals : boolean, TRUE is the two points are equals, FALSE otherwise */
+    /* equals : Boolean, FALSE if the points A and B are differents, TRUE if they're equals with and error of 0.000001 (10 to the power -6) */
     Bool equals = FALSE;
 
-/* i : integer, iteration variable for a fro-loop */
-    int i;
+    /* if B-0.000001 < A < B+0.000001, then we consider that A equals B (we check for both point's x and y coordinates) */
+    if( (A.x < B.x + 0.000001) && (A.x > B.x - 0.000001) && (A.x < B.x + 0.000001) && (A.x > B.x - 0.000001)){
 
-/* pt1, pt2 : array of caracters, respecctivly store the strings corresponding to the first and the second points given in parameters */
-    char* pt1 = (char*) malloc(25*sizeof(char));
-    char* pt2 = (char*) malloc(25*sizeof(char));
-
-/* this for-loop initialize the array of caracters by putting in every place a space */
-    for(i=0; i<24; i++){
-        pt1[i] = ' ';
-        pt2[i] = ' ';
-    }
-
-/* store the coordinates of the 2 points given in the 2 arrays. the x and y coordinates are separeted by a coma. */
-    sprintf( pt1, "%.5f,%.5f", A.x, A.y);
-    sprintf( pt2, "%.5f,%.5f", B.x, B.y);
-
-/* the function strcmp return 0 if the 2 strings are strictly identicals */
-    if(strcmp(pt1, pt2)==0){
         equals = TRUE;
+
     }
 
     return equals;
 
 }
+
 
 
 Polygon scalePolygon(Polygon p, float factor){
@@ -395,16 +384,18 @@ Polygon scalePolygon(Polygon p, float factor){
  * temppt : Point, store the coordinates of the current point of the polygon, which change with each iteration of the for-loop
  * ref : Point, store the coordinates of the first point of the polygon, which will act a the stationary reference
  * pscaled : Polygon, store the scaled version of the polygon given in parameter
+ * elem : pointer on an element, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
  */
     int i;
     Point temppt;
+    Element* elem = p.head;
     Point ref = p.head->point;
     Polygon pscaled = createPolygon();
 
 /* if the polygon have a least 1 point */
     if(p.N > 0){
         /* we add the first point of the initial polygon (the reference) to the scaled polygon without changing anything */
-        addPoint(pscaled, p.head->point);
+        addPoint(pscaled, elem->point);
 
         /* if there's more than 1 single point in the polygon */
         if(p.N > 1){
@@ -412,9 +403,9 @@ Polygon scalePolygon(Polygon p, float factor){
             /* from the 2nd point to the last point of the polygon */
             for(i=1;  i<p.N-1; i++){
                 /* we take the next point in the initial polygon */
-                    p.head = p.head->next;
+                    elem = elem->next;
                 /* we scale the vector linking the ref-point to the current point by the given factor and we store the new coordinates in the temporary Point-type variable */
-                    temppt = createPoint( (p.head->point.x - ref.x)*factor + ref.x , (p.head->point.y - ref.y)*factor + ref.y );
+                    temppt = createPoint( (elem->point.x - ref.x)*factor + ref.x , (elem->point.y - ref.y)*factor + ref.y );
                 /* then we add this point to the scaled version of the polygon */
                     addPoint(pscaled, temppt);
 
@@ -429,18 +420,28 @@ Polygon scalePolygon(Polygon p, float factor){
 
 Polygon translatePolygon(Polygon p, Point pt1, Point pt2){
 
+    /*
+     * i : integer, iteration value for a for-loop
+     * temppt : Point-type variable, literally means 'TEMPorary PoinT', store the newly translated point's coordinates
+     * tvect : Point-type variable, store the coordinates of the vector going from pt1 to pt2, which corresponds to the translation applied to all points
+     * elem : pointer on an element, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
+     * ptranslated : Polygon-type variable, store the points of the translated version of the given polygon p
+     */
     int i;
     Point temppt;
     Point tvect = createPoint( pt2.x - pt1.x , pt2.y - pt1.y );
+    Element* elem = p.head;
     Polygon ptranslated = createPolygon();
 
+/* if the polygon's size is superior to 0 */
     if( p.N > 0){
 
+        /* then, for every points of p, we tranlate it and we add it to ptranslated */
         for(i=0; i < p.N; i++){
 
-            temppt = createPoint(p.head->point.x + tvect.x, p.head->point.y + tvect.y);
+            temppt = createPoint(elem->point.x + tvect.x, elem->point.y + tvect.y);
             ptranslated = addPoint( ptranslated, temppt);
-            p.head = p.head->next;
+            elem = elem->next;
 
         }
     }
@@ -460,21 +461,24 @@ void printPolygon(Polygon p){
 
     /*
      * i : integer, iteration value for a for-loop
+     * elem : pointer on an element of a polygon, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
      */
     int i;
+    Element* elem = p.head;
+
     if(p.N > 0){
 
         /* we start by prompting an opening bracket and the first point of the polygon */
         printf("[");
-        printPoint(p.head->point);
+        printPoint(elem->point);
 
         if(p.N >1){
             /* after that, for each point of the polygon, we display it on the user's screen, separeted from the previous point by a coma */
             for(i = 1; i<= p.N-1; i++){
 
               printf(",");
-              p.head = p.head->next;
-              printPoint(p.head->point);
+              elem = elem->next;
+              printPoint(elem->point);
 
             }
         }
@@ -491,9 +495,11 @@ char* toString(Polygon p){
      * i : integer, size of the string that we'll return at the end of this function
      * j : integer, iteration value for a for-loop
      * index : integer, total length of all already-stored characters
+     * elem : pointer on an element of a polygon, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
      */
     int i = 100, j;
     int index;
+    Element* elem = p.head;
 
     /*
      * firstpt : boolean, TRUE if the current point is the first, FALSE otherwise
@@ -517,10 +523,10 @@ char* toString(Polygon p){
         }
 
         /* we add the next point to the string */
-        index = sprintf( buffer, "%s[%.2f,%.2f]", buffer, p.head->point.x, p.head->point.y);
+        index = sprintf( buffer, "%s[%.2f,%.2f]", buffer, elem->point.x, elem->point.y);
 
         /* and we take the next one */
-        p.head = p.head->next;
+        elem = elem->next;
 
 
         /* if there's less than 30 empty spaces remaining in the string */
@@ -548,6 +554,7 @@ Polygon convexhullPolygon( Polygon p){
      * x : pointer on an element of chp.
      * y : pointer on an element of p.
      * z : pointer on an element of p.
+     * elem : pointer on an element of a polygon, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
      */
 
     Element* fstpt = p.head;
@@ -555,6 +562,7 @@ Polygon convexhullPolygon( Polygon p){
     Element* y;
     Element* z;
     Polygon chp = createPolygon();
+    Element* elem = p.head;
 
     /* check if the polygon is not empty */
     if(p.N > 0){
@@ -565,15 +573,15 @@ Polygon convexhullPolygon( Polygon p){
             /* if it's the case, the convexhull of p is p itself, so chp = p */
             do{
                 /* we simply add each point of p in chp, and the while-loop will stop when it reach the first point, which mean that each points have been treated */
-                chp = addPoint(chp, p.head->point);
-                p.head = p.head->next;
+                chp = addPoint(chp, elem->point);
+                elem = elem->next;
 
-            }while( p.head != fstpt);
+            }while( elem != fstpt);
         }
         else{
     /* if p has 3 or more points, we call 2 functions before computing the convexhull.
      * first one, minY will simply check every point to find the one with the lowest y-coordinate.
-     * after, sortPolygon will sort the polygon in ascending order according to a specific angle (Cf function sortPolygon), and will put the previiously found point at the head of this sorted version
+     * after, sortPolygon will sort the polygon in ascending order according to a specific angle (Cf function sortPolygon), and will put the previously found point at the head of this sorted version
      */
             p = minY(p);
             p = sortPolygon(p);
@@ -582,11 +590,12 @@ Polygon convexhullPolygon( Polygon p){
      * Then, we re-set the fstpt value to be the 1st point of p, we add this point to chp, point x on it, and set y and z on the 2nd and 3rd point of p.
      * x has to be set on a chp's point, because x must only points on a point which is part of the convexhull.
      */
-            fstpt = p.head;
-            chp = addPoint(chp, p.head->point);
+            elem = p.head;
+            fstpt = elem;
+            chp = addPoint(chp, elem->point);
             x = chp.head;
-            y = p.head->next;
-            z = p.head->next->next;
+            y = elem->next;
+            z = elem->next->next;
 
 
     /* this do-while-loot check, for each triplet of point, if the angle between xy and yz is CLOCKWISE, ANTICLOCKWISE or if these vector are colinear */
@@ -621,20 +630,22 @@ Polygon minY(Polygon p){
     /*
      * i : integer, use to iterate with a for-loop.
      * minimumy : pointer on an element of alinked list, aka a point of a polygon. Point on the element with the lowest y-coordinate, which is the first point at the begining.
+     * elem : pointer on an element of a polygon, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
      */
 
     int i;
     Element* minimumy = p.head;
+    Element* elem = p.head;
 
 
     for(i=0; i<p.N-1; i++){
 
-        p.head = p.head->next;
+        elem = elem->next;
 
         /* if the current point has a lower y-coord. than the previous value of minimumy, of if it had the same value in y and a lower x-coord., then the current point is the new minimumy value */
-        if(p.head->point.y < minimumy->point.y  || ( p.head->point.y <= minimumy->point.y && p.head->point.x < minimumy->point.x ) ){
+        if(elem->point.y < minimumy->point.y  || ( elem->point.y <= minimumy->point.y && elem->point.x < minimumy->point.x ) ){
 
-            minimumy = p.head;
+            minimumy = elem;
 
         }
 
@@ -643,6 +654,7 @@ Polygon minY(Polygon p){
     /*
      * at the end of the for-loop, minimumy has stored the point with the lowest y->coordinate.
      * We simply set it as the head of p, and we return p.
+     * We do not use elem here, because the point of this loop is to move the head of p, not elem.
      */
     while( p.head != minimumy ){
 
@@ -710,6 +722,7 @@ Polygon sortPolygon( Polygon p){
      * ptref : Point-type variable, represent the reference point. It should be the point with the lowest ordinates, like the one spoted by the minY function.
      * sp : Polygon-type variable, sorted version of the given polygon p.
      * theta : double, store the value of the angle between the vector linking the current point with ptref and the (1,0) vector.
+     * elem : pointer on an element of a polygon, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
      */
 
     int i, j;
@@ -718,12 +731,14 @@ Polygon sortPolygon( Polygon p){
     Point ptref = createPoint( p.head->point.x, p.head->point.y);
     Polygon sp = createPolygon();
 
+    Element* elem = p.head;
+
     /* we check if the polygon has at least a point in it. */
-    if(p.head != NULL){
+    if(elem != NULL){
 
         /* if it has, we add the next one to the sorted polygon, and we move the head of the linked list on the one after it */
-        sp = addPoint(sp, p.head->next->point);
-        p.head = p.head->next->next;
+        sp = addPoint(sp, elem->next->point);
+        elem = elem->next->next;
 
         /* we check if the polygon has at least 2 points. if it has, then we're not in a trivial case, and we can apply the full function */
         if( p.N >= 2 ){
@@ -732,9 +747,9 @@ Polygon sortPolygon( Polygon p){
 
         /* we reset the value of j, and, if the current point is not the reference point, then we compute the value of theta */
                 j = 0;
-                if(pointsEquality(p.head->point, ptref)==FALSE){
+                if(pointsEquality(elem->point, ptref)==FALSE){
 
-                    theta = angleOx(p.head->point, ptref);
+                    theta = angleOx(elem->point, ptref);
 
                     /*  we check, for each point already stored, if theta is lower or greater than the corresponding angle (the previous values of theta) */
                     while(theta > angleOx(sp.head->point, ptref) && j!=sp.N){
@@ -744,10 +759,10 @@ Polygon sortPolygon( Polygon p){
 
                     }
 
-                    if( pointsEquality(p.head->point, sp.head->point) == FALSE){
+                    if( pointsEquality(elem->point, sp.head->point) == FALSE){
                     /* if the current point and the one which will be right after it are differents, we add the current point to sp */
                         j++;
-                        sp = addPoint(sp, p.head->point);
+                        sp = addPoint(sp, elem->point);
 
                     }
 
@@ -761,7 +776,7 @@ Polygon sortPolygon( Polygon p){
 
                 }
 
-                p.head = p.head->next;
+                elem = elem->next;
 
             }
         /* just before ending the function, we add, at the begining of sp, the reference point, which has to be the head of the returned polygon */

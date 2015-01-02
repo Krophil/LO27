@@ -109,7 +109,7 @@ Polygon rotatePolygon(Polygon P, Point center, float angle);
 Bool pointsEquality(Point A, Point B);
 /*
  * the function pointEquals compare the coordinates of the 2 points to find out if it's the same point (TRUE) or not (FALSE).
- * This function check the equality of the coordinates by taking an approximation to 1/10000.
+ * This function check if A's coordinates are between B's one +/- 0.000001 (10 to the power -6).
  */
 
 
