@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef DEF_
-#define DEF_
+#ifndef STATE_H
+#define STATE_H
 
 typedef enum{
     INSIDE=1,

@@ -126,7 +126,7 @@ Bool containsPoint(Polygon p, Point point){
     int intersect, i;
     Element* testa;
     Element* testb;
-    Bool line, isIn;
+    Bool isIn;
     intersect=0;
     /*intersect represents the number of intersections between the ray of the testing point
      * and the different sides of the polygon
@@ -139,6 +139,9 @@ Bool containsPoint(Polygon p, Point point){
         return FALSE;
     }else{
         for (i=0;i<p.N;i++){/*p.N is the number of points in the polygon*/
+            if(isOnTheLine(point, testa->point,testb->point)){
+                    return TRUE;
+            }
             if((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testb->point.y>=point.y)){
                 /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
                  */
@@ -159,8 +162,7 @@ Bool containsPoint(Polygon p, Point point){
             }
         }
         isIn=intersect%2;
-        line=isOnTheLine(point,testa->point,testb->point);
-        return isIn||line;
+        return isIn;
 }
 
 State containsPolygon(Polygon p1, Polygon p2){
@@ -170,8 +172,9 @@ State containsPolygon(Polygon p1, Polygon p2){
         }
         else if(inside(p2,p1)){
             return SAMESHAPE;
-                }
+        }else{
         return INSIDE;
+        }
     }
     else if(outside(p1,p2)){
             if (inside(p2,p1)){
@@ -179,29 +182,25 @@ State containsPolygon(Polygon p1, Polygon p2){
             }else{
                 return OUTSIDE;
         }
-    }
+    }else{
     return INTERSECT;
+    }
 }
 
-
 Bool inside(Polygon p1, Polygon p2){
-    if(p1.N==p2.N){
-        Element* test=p2.head;
-        Bool isInside=TRUE;
-        int i=0;
-        do{
-            isInside=containsPoint(p1,test->point);
-            test=test->next;
-            i++;
-        }while(isInside==TRUE && i<p1.N);
-        return isInside;
-    }else{
-        return FALSE;
-    }
+    Element* test=p2.head;
+    Bool isInside=TRUE;
+    int i=0;
+    do{
+        isInside=containsPoint(p1,test->point);
+        test=test->next;
+        i++;
+    }while(isInside==TRUE && i<p2.N);
+    return isInside;
 }
 
 Bool outside(Polygon p1, Polygon p2){
-    Element* test=p2.head;
+    Element* test=p1.head;
     Bool isInside=TRUE;
     int i=0;
     do{
@@ -216,30 +215,33 @@ Bool equal(Polygon p1, Polygon p2){
     Element* a;
     Element* b;
     Bool same;
+    same=FALSE;
     int i=0;
     a=p1.head;
     b=p2.head;
-    do{
-        if(a->point.x==b->point.x && a->point.y==b->point.y){
-            same=TRUE;
-        }
-        b=b->next;
-        i++;
-    }while(same==FALSE && i<p2.N);
-    if(same==TRUE){
-        b=b->prev;
-        same=FALSE;
-        i=0;
+    if(p1.N==p2.N){
         do{
             if(a->point.x==b->point.x && a->point.y==b->point.y){
-                same=TRUE;
-                a=a->next;
-                b=b->next;
-                i++;
-            }else{
-                same=FALSE;
+            same=TRUE;
             }
-        }while(same==TRUE && i<p2.N);
+            b=b->next;
+            i++;
+        }while(same==FALSE && i<p2.N);
+        if(same==TRUE){
+            b=b->prev;
+            same=FALSE;
+            i=0;
+            do{
+                if(a->point.x==b->point.x && a->point.y==b->point.y){
+                    same=TRUE;
+                    a=a->next;
+                    b=b->next;
+                    i++;
+                }else{
+                    same=FALSE;
+                }
+            }while(same==TRUE && i<p2.N);
+        }
     }
     return same;
 
