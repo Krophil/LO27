@@ -100,7 +100,7 @@ Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i);
 
 Polygon unionPolygons(Polygon p1, Polygon p2);
 
-Polygon rotatePolygon(Polygon P, Point center, float angle);
+Polygon rotatePolygon(Polygon P, Point center, double angle);
 /*
  * The function rotatePolygon compute, from a given polygon, center of rotation and angle, the corresponding polygon.
  * To find the new polygon, we rotate the given polygon around the center by the given angle.
@@ -113,7 +113,7 @@ Bool pointsEquality(Point A, Point B);
  */
 
 
-Polygon scalePolygon(Polygon p, float factor);
+Polygon scalePolygon(Polygon p, double factor);
 /*
  * the function scalePolygon literally scale the polygon given in parameters by the factor specifiedand return the correspondind scaled polygon.
  * the coordinates of the first point stay unchanged because we scale the polygon by taking it as a stationary reference.

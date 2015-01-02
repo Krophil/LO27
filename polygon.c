@@ -298,7 +298,7 @@ Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
 }
 
 
-Polygon rotatePolygon(Polygon p, Point center, float angle){
+Polygon rotatePolygon(Polygon p, Point center, double angle){
     /*
      * tempi : integer, used as the iteration variable of a for-loop
      * xr, yr : doubles, respectivly the coordinates of the new rotated point on the x-axis and the y-axis
@@ -377,7 +377,7 @@ Bool pointsEquality( Point A, Point B){
 
 
 
-Polygon scalePolygon(Polygon p, float factor){
+Polygon scalePolygon(Polygon p, double factor){
 
 /*
  * i : integer, iteration variable for a for-loop
