@@ -388,7 +388,7 @@ Polygon scalePolygon(Polygon p, double factor){
 /* if the polygon have a least 1 point */
     if(p.N > 0){
         /* we add the first point of the initial polygon (the reference) to the scaled polygon without changing anything */
-        addPoint(pscaled, elem->point);
+        pscaled = addPoint(pscaled, elem->point);
 
         /* if there's more than 1 single point in the polygon */
         if(p.N > 1){
@@ -400,7 +400,7 @@ Polygon scalePolygon(Polygon p, double factor){
                 /* we scale the vector linking the ref-point to the current point by the given factor and we store the new coordinates in the temporary Point-type variable */
                     temppt = createPoint( (elem->point.x - ref.x)*factor + ref.x , (elem->point.y - ref.y)*factor + ref.y );
                 /* then we add this point to the scaled version of the polygon */
-                    addPoint(pscaled, temppt);
+                    pscaled = addPoint(pscaled, temppt);
 
             }
         }
