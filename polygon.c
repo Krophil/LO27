@@ -310,9 +310,9 @@ Polygon rotatePolygon(Polygon p, Point center, double angle){
      */
     int tempi;
     double xr, yr;
-    /* double temp1, temp2; */
     Polygon protated = createPolygon();
     Point temppt;
+    Element* elem = p.head;
 
 /* this for-loop is used for taking every single points of the initial polygon */
     for(tempi = 0; tempi < p.N; tempi++){
@@ -321,23 +321,16 @@ Polygon rotatePolygon(Polygon p, Point center, double angle){
         if( p.N != 0){
 
       /* we check if the current point and the center of the rotation are equals, because applying the rotation to this point algorithm is pointless. */
-             if( pointsEquality( p.head->point, center )){
-                    protated = addPoint( protated, p.head->point);
+             if( pointsEquality( elem->point, center )){
+                    protated = addPoint( protated, elem->point);
              }
              else{
 
-                printf(" Xa = %.2f, Ya = %.2f \n cos = %.5f\nsin = %.5f\n ", p.head->point.x - center.x, p.head->point.y - center.y, cos(angle), sin(angle));
-
-
-                xr = (p.head->point.x - center.x)*cos(angle) - (p.head->point.y - center.y)*sin(angle);
-                yr = (p.head->point.x - center.x)*sin(angle) + (p.head->point.y - center.y)*cos(angle);
-
-                printf("%.2f, %.2f\n", xr, yr);
+                xr = (elem->point.x - center.x)*cos(angle) - (elem->point.y - center.y)*sin(angle);
+                yr = (elem->point.x - center.x)*sin(angle) + (elem->point.y - center.y)*cos(angle);
 
                 xr = xr + center.x;
                 yr = yr + center.y;
-
-                printf("%.2f, %.2f\n", xr, yr);
 
                 /* we create this point with the coordinates we've found before */
                   temppt = createPoint(xr, yr);
@@ -352,7 +345,7 @@ Polygon rotatePolygon(Polygon p, Point center, double angle){
         }
 
         /* and we place the 'head' pointer of the initial polygon on the next point */
-                  p.head = p.head->next;
+                  elem = elem->next;
     }
 
     return protated;
