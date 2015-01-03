@@ -299,18 +299,18 @@ Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
 
 
 Polygon rotatePolygon(Polygon p, Point center, double angle){
+
     /*
      * tempi : integer, used as the iteration variable of a for-loop
      * xr, yr : doubles, respectivly the coordinates of the new rotated point on the x-axis and the y-axis
      * temp1 : double, store the value of an angle
      * temp2: double, store the value of the norm of a vector
-     * elem : pointer on an element, elem only exist for avoiding manipulate directly the head of the polygon. equivalent to 'p.head' at every step of the function
-     * protated : Polygon, correspond to the rotated version of the initial polygon
-     * temppt : Point, temporarily store the current coordinates of the newly rotated point
+     * protated : Polygon, correspond to the rotated version of the initail polygon
+     * temppt : Point, temporarly store the current coordinates of the newly rotated point
      */
     int tempi;
-    double xr, yr, temp1, temp2;
-    Element* elem = p.head;
+    double xr, yr;
+    /* double temp1, temp2; */
     Polygon protated = createPolygon();
     Point temppt;
 
@@ -320,29 +320,30 @@ Polygon rotatePolygon(Polygon p, Point center, double angle){
     /* if the polygon is not empty */
         if( p.N != 0){
 
-      /* we check if the current point and the center of the rotation are equals. If it's the case, applying the rotation algorithm is pointless. */
-             if( pointsEquality( elem->point, center )){
-
+      /* we check if the current point and the center of the rotation are equals, because applying the rotation to this point algorithm is pointless. */
+             if( pointsEquality( p.head->point, center )){
+                    protated = addPoint( protated, p.head->point);
              }
              else{
 
-                /* first of all, we compute the value of the angle between the x-axis and the vector linking the center to the current point of the polygon. */
-                  temp1 = atan( ( elem->point.y - center.y) / (elem->point.x - center.x) - angle );
+                printf(" Xa = %.2f, Ya = %.2f \n cos = %.5f\nsin = %.5f\n ", p.head->point.x - center.x, p.head->point.y - center.y, cos(angle), sin(angle));
 
-                /* Then we compute the norm of this vector */
-                  temp2 = sqrt( pow(( elem->point.x - center.x),2) + pow(( elem->point.y - center.y ),2) );
 
-                /* we calculate the coordinates of the new rotated point */
-                  xr = temp2 + cos(temp1) + center.x;
-                  yr = temp2 + sin(temp1) + center.y;
+                xr = (p.head->point.x - center.x)*cos(angle) - (p.head->point.y - center.y)*sin(angle);
+                yr = (p.head->point.x - center.x)*sin(angle) + (p.head->point.y - center.y)*cos(angle);
+
+                printf("%.2f, %.2f\n", xr, yr);
+
+                xr = xr + center.x;
+                yr = yr + center.y;
+
+                printf("%.2f, %.2f\n", xr, yr);
 
                 /* we create this point with the coordinates we've found before */
                   temppt = createPoint(xr, yr);
 
                 /* we add this point to the polygon which will contains the rotated points */
                   protated = addPoint( protated, temppt);
-
-
 
               }
 
@@ -351,12 +352,11 @@ Polygon rotatePolygon(Polygon p, Point center, double angle){
         }
 
         /* and we place the 'head' pointer of the initial polygon on the next point */
-                  elem = elem->next;
+                  p.head = p.head->next;
     }
 
     return protated;
 }
-
 
 
 Bool pointsEquality( Point A, Point B){
