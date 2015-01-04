@@ -103,7 +103,7 @@ Polygon unionPolygons(Polygon p, Polygon q){
         }else{
             r=q;
         }
-    }else if (status==INTERSECT){
+    }else if (status==INTERSECT || status==OUTSIDE){
 
         do{
             r=addPoint(r,i->point);
