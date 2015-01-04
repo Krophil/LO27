@@ -85,10 +85,7 @@ Polygon removePoint(Polygon p, int i){
 Polygon unionPolygons(Polygon p, Polygon q){
     Polygon r = createPolygon();
     Element* i=p.head;
-    Element* j=q.head;
-    Point* intersect;
     State status=containsPolygon(p,q);
-    intersect=NULL;
     if(status==INSIDE || status==ENCLOSING){
         do{
             r=addPoint(r,i->point);
@@ -107,17 +104,19 @@ Polygon unionPolygons(Polygon p, Polygon q){
             r=q;
         }
     }else if (status==INTERSECT){
-        i=minCoordinates(p);
-        addPoint(r, i->point);
-        if (intersectSegments(i->point,i->next->point,j->point,j->next->point, intersect)){
-            addPoint(r, (*intersect));
-            if(j->next->point.x>=j->point.x){
-                j=i;
-                i->point=*intersect;
-            }else{
 
-            }
-        }
+        do{
+            r=addPoint(r,i->point);
+            i=i->next;
+        } while(i!=NULL);
+        i=q.head;
+        r=addPoint(r,i->point);
+        do{
+            r=addPoint(r,i->point);
+            i=i->next;
+        } while(i!=NULL);
+        r=minY(r);
+        r=convexhullPolygon(r);
     }
     return r;
 }
@@ -691,23 +690,6 @@ Rot rotDir(Element* x, Element* y, Element* z){
     return rotation;
 
 }
-
-Element* minCoordinates(Polygon p){
-
-    int i;
-    Element* mini = p.head;
-    Element* test = p.head;
-
-    for(i=0; i<p.N; i++){
-        if(test->point.x+test->point.y<mini->point.x+mini->point.y){
-            mini = test;
-        }
-        test = test->next;
-    }
-
-    return mini;
-}
-
 
 Polygon sortPolygon( Polygon p){
 

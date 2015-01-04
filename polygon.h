@@ -13,6 +13,7 @@
 #include <state.h>
 #include <math.h>
 #include <string.h>
+#include <rot.h>
 
 
 typedef struct{
