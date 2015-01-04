@@ -7,12 +7,16 @@
  *
  */
 
-#ifndef BOOL_H
-#define BOOL_H
+#ifndef _ROT_H_
+#define _ROT_H_
 
 typedef enum{
-    TRUE=1,
-    FALSE=0
-}Bool;
+    NONE = 0,
+    CLOCKWISE = 1,
+    ANTICLOCKWISE = 2
+}Rot;
+
+
 
 #endif
+
