@@ -459,6 +459,8 @@ void printPolygon(Polygon p){
     int i;
     Element* elem = p.head;
 
+    printf("[");
+
     if(p.N > 0){
 
         /* we start by prompting an opening bracket and the first point of the polygon */
