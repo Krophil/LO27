@@ -39,12 +39,12 @@ Polygon createPolygon(){
 Polygon addPoint(Polygon a, Point b){
     Element* B = (Element *)malloc(sizeof(Element));
     B->point = b;
-    if(a.N==0){
+    if(a.N==0){/*case where the polygon is empty*/
         B->prev = a.head;
         B->next = a.head;
         a.head = B;
         a.head->index=1;
-    }else if(a.N==1){
+    }else if(a.N==1){/*case where the polygon has one point*/
         B->prev = a.head;
         B->next = a.head;
         a.head->next = B;
@@ -67,7 +67,7 @@ Polygon removePoint(Polygon p, int i){
     supp=p.head;
 
 
-    if(p.N>=0){
+    if(p.N>=0){/*excludes the case where the polygon is empty*/
         if (i==1){
             p.head->next=p.head;
             p.head->prev->prev->next=p.head;
@@ -87,6 +87,10 @@ Polygon unionPolygons(Polygon p, Polygon q){
     Element* i=p.head;
     State status=containsPolygon(p,q);
     if(status==INSIDE || status==ENCLOSING){
+        /*Algorithm creating a line between the last point
+         * of the first polygon and the first point of the
+         * second polygon.
+         */
         do{
             r=addPoint(r,i->point);
             i=i->next;
@@ -98,13 +102,14 @@ Polygon unionPolygons(Polygon p, Polygon q){
             i=i->next;
         } while(i!=NULL);
     }else if(status==SAMESHAPE){
+        /*returns the polygon with the smallest number of point*/
         if(p.N>=q.N){
             r=p;
         }else{
             r=q;
         }
     }else if (status==INTERSECT || status==OUTSIDE){
-
+        /*makes a Convex Hull around both polygons*/
         do{
             r=addPoint(r,i->point);
             i=i->next;
@@ -154,6 +159,7 @@ Bool containsPoint(Polygon p, Point point){
                 testb=testa;
                 testa=testa->next;
             }else if(testb->point.x+((point.y-testb->point.y)/(testa->point.y-testb->point.y))*(testa->point.x-testb->point.x)<=point.x){
+                /*do the same thing than previously but it is the case where a is above b*/
                 intersect++;
                 testb=testa;
                 testa=testa->next;
@@ -191,6 +197,7 @@ Bool inside(Polygon p1, Polygon p2){
     Bool isInside=TRUE;
     int i=0;
     do{
+        /*Check if every point of the polygon p1 is in the polygon p2*/
         isInside=containsPoint(p1,test->point);
         test=test->next;
         i++;
@@ -203,6 +210,7 @@ Bool outside(Polygon p1, Polygon p2){
     Bool isInside=TRUE;
     int i=0;
     do{
+        /*Check if every point of the polygon p1 is out of the polygon p2*/
         isInside=containsPoint(p2,test->point);
         test=test->next;
         i++;
@@ -220,6 +228,9 @@ Bool equal(Polygon p1, Polygon p2){
     b=p2.head;
     if(p1.N==p2.N){
         do{
+            /* Search the two equal points of each polygon from
+             * the head of the first one.
+             */
             if(a->point.x==b->point.x && a->point.y==b->point.y){
             same=TRUE;
             }
@@ -231,6 +242,9 @@ Bool equal(Polygon p1, Polygon p2){
             same=FALSE;
             i=0;
             do{
+                /* Checks if each point is equal to its corresponding
+                 * point in the other polygon.
+                 */
                 if(a->point.x==b->point.x && a->point.y==b->point.y){
                     same=TRUE;
                     a=a->next;
@@ -247,6 +261,7 @@ Bool equal(Polygon p1, Polygon p2){
 }
 
 Bool isOnTheLine(Point p, Point a, Point b){
+    /*Checks if the point p is on the segment [a;b]*/
     Point vectA,vectB;
     Bool line=FALSE;
     vectA.x=p.x-a.x;
@@ -262,6 +277,7 @@ Bool isOnTheLine(Point p, Point a, Point b){
 }
 
 Polygon centralSymmetry(Polygon p, Point a){
+    /* Make the symmetric polygon of p about the point a*/
     Polygon newPol= createPolygon();
     Element* cr=p.head;
     Point point;
@@ -276,6 +292,10 @@ Polygon centralSymmetry(Polygon p, Point a){
 }
 
 Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
+    /*
+     * Returns if 2 segments intersects each other and i the pointer
+     * on the point of the intersection.
+     */
     Point s1,s2;
     double s, t;
     s1.x=p2.x-p1.x;

@@ -88,19 +88,30 @@ State containsPolygon(Polygon p1, Polygon p2);
  */
 
 Bool inside(Polygon p1, Polygon P2);
+/*Check if every point of the polygon p1 is in the polygon p2*/
 
 Bool outside(Polygon p1,Polygon p2);
+/*Check if every point of the polygon p1 is out of the polygon p2*/
 
 Bool equal(Polygon p1,Polygon p2);
+/*Checks if every point of p1 has its corresponding point in p2*/
 
 Polygon centralSymmetry(Polygon p, Point a);
+/* Make the symmetric polygon of p about the point a*/
 
 Bool isOnTheLine(Point p, Point a, Point b);
+/*Checks if the point p is on the segment [a;b]*/
 
 Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i);
+/*
+ * Returns if 2 segments intersects each other and i the pointer
+ * on the point of the intersection.
+ */
 
 Polygon unionPolygons(Polygon p1, Polygon p2);
-
+/*
+ * Returns an association of the polygons p1 and p2.
+ */
 Polygon rotatePolygon(Polygon P, Point center, double angle);
 /*
  * The function rotatePolygon compute, from a given polygon, center of rotation and angle, the corresponding polygon.
