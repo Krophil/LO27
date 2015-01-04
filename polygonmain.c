@@ -22,6 +22,7 @@ int main(int argc, char* argv[]){
     Polygon p3;
     Bool err1=FALSE;
     Bool err2=FALSE;
+    Bool err3=FALSE;
     Bool polComplete=FALSE;
     Bool testPoint;
     int test;
@@ -111,7 +112,7 @@ int main(int argc, char* argv[]){
                                         printf("Here we have the two polygons :\n");
                                         printPolygon(p1);
                                         printPolygon(p2);
-                                        printf("What do you want to do with these polygons ?\n1. How are those two polygons ?\n2. Let's assembly them !\n\nEvery man builds his world in his own image.\nHe has the power to choose, but no power to escape the necessity of choice :\t");
+                                        printf("What do you want to do with these polygons ?\n1. How are those two polygons ?\n2. Let's assembly them !\n3. Translate one of them, or both\n4. Rotate one of them, of both\n5. Scale one of them, or both\n6. Compute the convexhull of one of them, or both\nYour choice :\t");
                                         scanf("%s",&c1);
                                         switch(atoi(&c1)){
                                             case 1:
@@ -145,6 +146,148 @@ int main(int argc, char* argv[]){
                                                 printf("Here is your polygon, union of the two to-- polygons :\n");
                                                 printPolygon(p3);
                                                 break;
+
+                                            case 3:
+
+                                                do{
+
+                                                    printf("Which polygon do you want to translate from a point to another ?\n\t1. the first one\n\t2. The second one\n\t3. Both of them(they'll have the same translation)\n\n\tYour choice : ");
+                                                    scanf("%s", &c1);
+                                                }while(atoi(&c1)!=1 && atoi(&c1)!=2 && atoi(&c1)!=3);
+
+                                                printf("starting point :\n\t Enter x : ");
+                                                scanf("%lf",&x);
+                                                printf("\n\tEnter y : ");
+                                                scanf("%lf",&y);
+                                                pt1 = createPoint(x, y);
+
+                                                printf("ending point :\n\t Enter x : ");
+                                                scanf("%lf",&x);
+                                                printf("\n\tEnter y : ");
+                                                scanf("%lf",&y);
+                                                pt2 = createPoint(x, y);
+
+
+
+                                                if(atoi(&c1)==1 || atoi(&c1)==3){
+                                                     p1 = translatePolygon(p1, pt1, pt2);
+                                                     err3 = TRUE;
+                                                }
+                                                else{
+
+                                                    if(atoi(&c1)==2 || atoi(&c1)==3){
+                                                        p2 = translatePolygon(p2, pt1, pt2);
+                                                        err3 = TRUE;
+                                                    }
+                                                }
+
+                                            break;
+
+                                            case 4:
+
+                                                do{
+                                                    printf("Which polygon do you want to rotate ?\n\t1. the first one\n\t2. The second one\n\t3. Both of them(they'll have the same rotation)\n\n\tYour choice : ");
+                                                    scanf("%s", &c1);
+
+                                                    if(atoi(&c1)==1 || atoi(&c1)==2 || atoi(&c1)==3){
+
+                                                        do{
+                                                            printf("Do you want to rotate around one of its point, or around another point?\n\t1. One of its point;\n\t2. Another point;\n Your choice : ");
+                                                            scanf("%s",&c2);
+                                                        }while(atoi(&c2)!=1 && atoi(&c2)!=2);
+                                                        switch(atoi(&c2)){
+                                                            case 1:
+                                                                    elem = p1.head;
+                                                                    printf("Please give us its number (the first point's number is 1, the second is 2, and so on....) : ");
+                                                                    scanf("%d", &i);
+
+                                                                    if(i == 1){
+                                                                        pt1 = p1.head->point;
+                                                                    }else{
+
+                                                                       for(i = i;i>1; i--){
+                                                                          elem = elem->next;
+                                                                     }
+
+                                                                        pt1 = elem->point;
+                                                                    }
+                                                            break;
+
+                                                            case 2:
+
+                                                                printf("Please enter the coordinates of this point :\n\t Enter x : ");
+                                                                scanf("%lf",&x);
+                                                                printf("\n\tEnter y : ");
+                                                                scanf("%lf",&y);
+                                                                pt1 = createPoint(x, y);
+                                                            break;
+                                                        }
+
+                                                        printf("Enter the angle of the rotation, in radian : ");
+                                                        scanf("%lf", &x);
+
+                                                        if(atoi(&c1)==1 || atoi(&c1)==3){
+                                                            p1 = rotatePolygon(p1, pt1, x);
+                                                            err3 = TRUE;
+                                                        }
+                                                        else{
+                                                            if(atoi(&c1)==2 || atoi(&c1)==3){
+                                                                p2 = rotatePolygon(p2, pt1, x);
+                                                                err3 = TRUE;
+                                                            }
+                                                        }
+                                                    }
+                                                }while(err3==FALSE);
+
+                                            break;
+
+                                            case 5:
+
+                                                do{
+                                                    printf("Which polygon do you want to scale ?\n\t1. the first one\n\t2. The second one\n\t3. Both of them(they'll be scaled by the same factor)\n\n\tYour choice : ");
+                                                    scanf("%s", &c1);
+                                                }while(atoi(&c1)!=1 && atoi(&c1)!=2 && atoi(&c1)!=3);
+
+
+                                                    printf("Enter the factor, which can be any real number : ");
+                                                    scanf("%lf", &x);
+
+                                                if(atoi(&c1)==1 || atoi(&c1)==3){
+                                                     p1 = scalePolygon(p1, x);
+                                                     err3 = TRUE;
+                                                }
+                                                else{
+
+                                                    if(atoi(&c1)==2 || atoi(&c1)==3){
+                                                        p2 = scalePolygon(p2, x);
+                                                        err3 = TRUE;
+                                                    }
+                                                }
+
+                                            break;
+
+                                            case 6:
+                                                do{
+                                                    printf("Which convexhull do you want to compute ?\n\t1. the CH of the first polygon\n\t2. The CH of the second one\n\t3. The CH of both of them (separately) \n\n\tYour choice : ");
+                                                    scanf("%s", &c1);
+                                                }while(atoi(&c1)!=1 && atoi(&c1)!=2 && atoi(&c1)!=3);
+
+
+                                                if(atoi(&c1)==1 || atoi(&c1)==3){
+                                                     p1 = convexhullPolygon(p1);
+                                                     err3 = TRUE;
+                                                }
+                                                else{
+
+                                                    if(atoi(&c1)==2 || atoi(&c1)==3){
+                                                        p2 = convexhullPolygon(p2);
+                                                        err3 = TRUE;
+                                                    }
+                                                }
+
+
+                                            break;
+
 
                                             }
                                         err2=FALSE;
