@@ -83,10 +83,17 @@ Polygon removePoint(Polygon p, int i){
 }
 
 Polygon unionPolygons(Polygon p, Polygon q){
-    Polygon r = createPolygon();
-    Element* i=p.head;
-    State status=containsPolygon(p,q);
-    if(status==INSIDE || status==ENCLOSING){
+    printf("la");
+    Polygon r;
+    r = createPolygon();
+    Element* i=(Element *)malloc(sizeof(Element));
+    i=p.head;
+    int j;
+    j=0;
+    printf("ici");
+    State status;
+    status = containsPolygon(p,q);
+    if(status==1 || status==4){
         /*Algorithm creating a line between the last point
          * of the first polygon and the first point of the
          * second polygon.
@@ -94,34 +101,42 @@ Polygon unionPolygons(Polygon p, Polygon q){
         do{
             r=addPoint(r,i->point);
             i=i->next;
-        } while(i!=NULL);
+            j++;
+        } while(j<=p.N);
         i=q.head;
-        r=addPoint(r,i->point);
+        j=0;
         do{
             r=addPoint(r,i->point);
             i=i->next;
-        } while(i!=NULL);
-    }else if(status==SAMESHAPE){
+            j++;
+        } while(j<=q.N);
+    }else if(status==6){
         /*returns the polygon with the smallest number of point*/
         if(p.N>=q.N){
             r=p;
         }else{
             r=q;
         }
-    }else if (status==INTERSECT || status==OUTSIDE){
+    }else if (status==3 || status==2){
         /*makes a Convex Hull around both polygons*/
+        printf("test");
         do{
             r=addPoint(r,i->point);
             i=i->next;
-        } while(i!=NULL);
+            j++;
+        } while(j<=p.N);
         i=q.head;
-        r=addPoint(r,i->point);
+        j=0;
         do{
             r=addPoint(r,i->point);
             i=i->next;
-        } while(i!=NULL);
+            j++;
+        } while(j<=q.N);
         r=minY(r);
         r=convexhullPolygon(r);
+    }
+    else{
+        printf("There is a problem with the polygons, maybe there are not real");
     }
     return r;
 }
@@ -140,35 +155,37 @@ Bool containsPoint(Polygon p, Point point){
     /*testa and testb are two consecutive points in the polygon
      */
     if (p.N<3){
-        return FALSE;
+        isIn=FALSE;
     }else{
         for (i=0;i<p.N;i++){/*p.N is the number of points in the polygon*/
             if(isOnTheLine(point, testa->point,testb->point)){
-                    return TRUE;
+                    isIn=TRUE;
+                    i=p.N;
             }
-            if((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testb->point.y>=point.y)){
-                /*tests if the Y-coordinate of the point is between the both Y-coordinates of a and b
-                 */
-                testb=testa;
+        }
+        if (isIn==FALSE){
+                for (i=0; i<p.N; i++){
+                    if ((testa->point.y<point.y && testb->point.y>=point.y) || (testb->point.y<point.y && testa->point.y>=point.y)) {
+                        if (testa->point.x+(point.y-testa->point.y)/(testb->point.y-testa->point.y)*(testb->point.x-testa->point.x)<point.x) {
+                            /*
+                             * Plots a half-line from the point and check if it intersects with one side
+                             * of the polygon.
+                             */
+                            intersect++;
+                        }
+                    }
                 testa=testa->next;
-            }else if(testa->point.x+((point.y-testa->point.y)/(testb->point.y-testa->point.y))*(testb->point.x-testa->point.x)<=point.x){
-                /*calculates the X-coordinate intersection between the ray of the testing point and the segment between point a and point b
-                 * if X>=Xintersec, it means there is an intersection
-                 */
-                intersect++;
-                testb=testa;
-                testa=testa->next;
-            }else if(testb->point.x+((point.y-testb->point.y)/(testa->point.y-testb->point.y))*(testa->point.x-testb->point.x)<=point.x){
-                /*do the same thing than previously but it is the case where a is above b*/
-                intersect++;
-                testb=testa;
-                testa=testa->next;
+                testb=testb->prev;
                 }
             }
         }
-        isIn=intersect%2;
-        return isIn;
+        if (intersect%2==0 && isIn==FALSE){
+            return FALSE;
+        }else{
+        return TRUE;
+        }
 }
+
 
 State containsPolygon(Polygon p1, Polygon p2){
     if (inside(p1,p2)){
@@ -177,6 +194,9 @@ State containsPolygon(Polygon p1, Polygon p2){
         }
         else if(inside(p2,p1)){
             return SAMESHAPE;
+            /*
+             * Each polygon is inside the other one.
+             */
         }else{
         return INSIDE;
         }
@@ -194,28 +214,24 @@ State containsPolygon(Polygon p1, Polygon p2){
 
 Bool inside(Polygon p1, Polygon p2){
     Element* test=p2.head;
-    Bool isInside=TRUE;
     int i=0;
-    do{
+    while(containsPoint(p1,test->point)==TRUE && i<=p2.N){
         /*Check if every point of the polygon p1 is in the polygon p2*/
-        isInside=containsPoint(p1,test->point);
         test=test->next;
         i++;
-    }while(isInside==TRUE && i<p2.N);
-    return isInside;
+        }
+    return containsPoint(p1,test->prev->point);
 }
 
 Bool outside(Polygon p1, Polygon p2){
-    Element* test=p1.head;
-    Bool isInside=TRUE;
+    Element* test=p2.head;
     int i=0;
-    do{
+    while(containsPoint(p1,test->point)==FALSE && i<=p1.N){
         /*Check if every point of the polygon p1 is out of the polygon p2*/
-        isInside=containsPoint(p2,test->point);
         test=test->next;
         i++;
-    }while(isInside==FALSE && i<p1.N);
-    return !isInside;
+    }
+    return !(containsPoint(p1,test->prev->point));
 }
 
 Bool equal(Polygon p1, Polygon p2){
@@ -268,7 +284,7 @@ Bool isOnTheLine(Point p, Point a, Point b){
     vectA.y=p.y-a.y;
     vectB.x=b.x-a.x;
     vectB.y=b.y-a.y;
-    if(vectA.x*vectB.y-vectB.x*vectB.y==0){
+    if(vectA.x*vectB.y-vectB.x*vectA.y==0){
         if((p.x<=a.x && p.y<=a.y && p.y>=b.y && a.y>=b.y)||(p.x>=a.x && p.y>=a.y && p.y<=b.y && a.y<=b.y)){
             line=TRUE;
                 }
@@ -283,9 +299,10 @@ Polygon centralSymmetry(Polygon p, Point a){
     Point point;
     int i;
     do{
-        point.x=2*a.x-cr->point.x;
-        point.y=2*a.x-cr->point.y;
+        point.x=cr->point.x+2*(a.x-cr->point.x);
+        point.y=cr->point.y+2*(a.x-cr->point.y);
         newPol=addPoint(newPol,point);
+        cr=cr->next;
         i++;
     }while(i<p.N);
     return newPol;
@@ -298,14 +315,20 @@ Bool intersectSegments(Point p1, Point p2, Point p3, Point p4, Point* i){
      */
     Point s1,s2;
     double s, t;
+    /*
+     * s1 and s2 are the two vectors corresponding to the lines (p1,p2) and (p3,p4)
+     */
     s1.x=p2.x-p1.x;
     s1.y=p2.y-p1.y;
     s2.x=p4.x-p3.x;
     s2.y=p4.y-p3.y;
+    /*
+     * s and t are the soustraction of the equations of the lines.
+     */
     s = (-s1.y*(p1.x-p3.x)+s1.x*(p1.y-p3.y))/(-s2.x*s1.y+s1.x*s2.y);
     t = ( s2.x*(p1.y-p3.y)-s2.y*(p1.x-p3.x))/(-s2.x*s1.y+s1.x*s2.y);
 
-    if((s>=0)&&(s<=1)&&(t>=0)&&(t<=1)){ /* Collision detected */
+    if((s>=0)&&(s<=1)&&(t>=0)&&(t<=1)){ /* Collision detected between the two segments.*/
         if (i!=NULL){
             i->x=p1.x+(t*s1.x);
             i->y=p1.y+(t*s1.y);
@@ -483,7 +506,6 @@ void printPolygon(Polygon p){
     if(p.N > 0){
 
         /* we start by prompting an opening bracket and the first point of the polygon */
-        printf("[");
         printPoint(elem->point);
 
         if(p.N >1){
@@ -498,8 +520,9 @@ void printPolygon(Polygon p){
         }
 
          /* finaly, we put and ending bracket */
-         printf("]\n");
     }
+    printf("]\n");
+
 }
 
 

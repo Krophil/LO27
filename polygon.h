@@ -190,7 +190,5 @@ double angleOx( Point a, Point b);
  * Without, sortPolygon will not work.
  */
 
-Element* minCoordinates(Polygon p);
-
 #endif
 
